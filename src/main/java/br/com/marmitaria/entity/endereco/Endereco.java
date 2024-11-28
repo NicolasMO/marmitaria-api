@@ -1,5 +1,7 @@
 package br.com.marmitaria.entity.endereco;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import br.com.marmitaria.entity.usuario.Usuario;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -46,7 +48,22 @@ public class Endereco {
 	private String cep;
 	
 	@ManyToOne
-	@JoinColumn(name = "usuario_id")
+	@JsonIgnore
+	@JoinColumn(name = "usuario_id", nullable = false)
 	private Usuario usuario;
+
+	public Endereco(String logradouro, String numero, String bairro, String cidade, String estado, String complemento,
+			String cep, Usuario usuario) {
+		this.logradouro = logradouro;
+		this.numero = numero;
+		this.bairro = bairro;
+		this.cidade = cidade;
+		this.estado = estado;
+		this.complemento = complemento;
+		this.cep = cep;
+		this.usuario = usuario;
+	}
+	
+	
 
 }
