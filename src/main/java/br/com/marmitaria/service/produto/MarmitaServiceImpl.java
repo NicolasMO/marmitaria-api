@@ -33,16 +33,16 @@ public class MarmitaServiceImpl implements MarmitaService {
 		Produto produto = produtoRepository.findById(marmitaDTO.getProdutoId())
 				.orElseThrow(() -> new RuntimeException("Produto não encontrado."));
 		
+		TipoMarmita tipoMarmita = definirTipoMarmitaComBaseNoProduto(produto);
 		// Valida ingredientes
 		List<Ingrediente> ingredientes = ingredienteRepository.findAllById(marmitaDTO.getIngredientesId());
 		if(ingredientes.size() != marmitaDTO.getIngredientesId().size()) {
 			throw new RuntimeException("Alguns ingredientes não foram encontrados");
 		}
 		
-		
-		
 		// Criar Marmita
 		Marmita marmita = new Marmita();
+		marmita.setTipoMarmita(tipoMarmita);
 		marmita.setProduto(produto);
 		List<MarmitaIngrediente> marmitaIngredientes = ingredientes.stream()
 				.map(ing -> new MarmitaIngrediente(null, marmita, ing))
@@ -61,6 +61,17 @@ public class MarmitaServiceImpl implements MarmitaService {
                 marmitaIngredientes.stream().map(mi -> mi.getIngrediente().getId()).collect(Collectors.toList())
         );
 	}
+	
+	private TipoMarmita definirTipoMarmitaComBaseNoProduto(Produto produto) {
+	    // Definindo o tipo de marmita com base no tipo de produto
+	    if (produto.getId() == 1) {
+	        return TipoMarmita.PEQUENA;
+	    } else if (produto.getId() == 2) {
+	        return TipoMarmita.GRANDE;
+	    } else {
+	        throw new RuntimeException("Tipo de produto inválido para definir tipo de marmita.");
+	    }
+    }
 	
 	private void validarIngredientesPorTipo(Marmita marmita) {
 	    TipoMarmita tipo = marmita.getTipoMarmita();
