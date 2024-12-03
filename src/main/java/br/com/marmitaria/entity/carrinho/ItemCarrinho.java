@@ -1,5 +1,7 @@
 package br.com.marmitaria.entity.carrinho;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import br.com.marmitaria.entity.produto.Produto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,6 +27,7 @@ public class ItemCarrinho {
     private Long id;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "carrinho_id", nullable = false)
     private Carrinho carrinho;
 

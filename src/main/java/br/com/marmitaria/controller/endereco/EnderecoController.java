@@ -25,7 +25,7 @@ public class EnderecoController {
 	
 	@PostMapping
 	public ResponseEntity<Endereco> cadastrarEndereco(@RequestBody CadastrarEnderecoDTO cadastrarEnderecoDTO) {
-		Endereco endereco = enderecoService.cadastrarEndereco(cadastrarEnderecoDTO);
-		return new ResponseEntity<Endereco>(endereco, HttpStatus.CREATED);
+		enderecoService.cadastrarEndereco(cadastrarEnderecoDTO);
+		return new ResponseEntity<Endereco>(HttpStatus.CREATED);
 	}
 }

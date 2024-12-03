@@ -21,7 +21,7 @@ public class MarmitaController {
 	
 	@PostMapping("/montar")
 	public ResponseEntity<MarmitaDTO> criarMarmita(@RequestBody MarmitaDTO marmitaDTO) {
-		MarmitaDTO marmitaCriada = marmitaService.criarMarmita(marmitaDTO);
-		return new ResponseEntity<MarmitaDTO>(marmitaCriada, HttpStatus.CREATED);
+		marmitaService.criarMarmita(marmitaDTO);
+		return new ResponseEntity<MarmitaDTO>(HttpStatus.CREATED);
 	}
 }

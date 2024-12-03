@@ -42,7 +42,7 @@ public class UsuarioController {
 	
 	@PostMapping
 	public ResponseEntity<Usuario> cadastrarUsuario(@RequestBody CadastrarUsuarioDTO cadastrarUsuarioDTO) {
-		Usuario usuario = usuarioService.cadastrarUsuario(cadastrarUsuarioDTO);
-		return new ResponseEntity<Usuario>(usuario, HttpStatus.CREATED);
+		usuarioService.cadastrarUsuario(cadastrarUsuarioDTO);
+		return new ResponseEntity<Usuario>(HttpStatus.CREATED);
 	}
 }

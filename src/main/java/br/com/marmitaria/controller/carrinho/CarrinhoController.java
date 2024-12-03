@@ -1,9 +1,10 @@
 package br.com.marmitaria.controller.carrinho;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.marmitaria.dto.carrinho.AddCarrinhoDTO;
@@ -19,9 +20,9 @@ public class CarrinhoController {
 		this.carrinhoService = carrinhoService;
 	}
 	
-	@PostMapping("/adicionar")
-	public ResponseEntity<Carrinho> adicionarItem(@RequestParam AddCarrinhoDTO addCarrinho) {
+	@PostMapping
+	public ResponseEntity<Carrinho> adicionarItem(@RequestBody AddCarrinhoDTO addCarrinho) {
 		Carrinho carrinho = carrinhoService.adicionarItemCarrinho(addCarrinho);
-		return ResponseEntity.ok(carrinho);
+		return new ResponseEntity<>(carrinho, HttpStatus.CREATED);
 	}
 }

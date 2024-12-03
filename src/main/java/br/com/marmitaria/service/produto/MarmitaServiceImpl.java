@@ -56,7 +56,6 @@ public class MarmitaServiceImpl implements MarmitaService {
 
         // Retornar DTO
         return new MarmitaDTO(
-                marmitaSalva.getId(),
                 marmitaSalva.getProduto().getId(),
                 marmitaIngredientes.stream().map(mi -> mi.getIngrediente().getId()).collect(Collectors.toList())
         );

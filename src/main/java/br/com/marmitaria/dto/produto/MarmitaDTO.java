@@ -8,7 +8,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class MarmitaDTO {
-	private Long id;
 	private Long produtoId;
 	private List<Long> ingredientesId;
 }

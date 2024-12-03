@@ -3,6 +3,8 @@ package br.com.marmitaria.entity.carrinho;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import br.com.marmitaria.entity.usuario.Usuario;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -30,6 +32,7 @@ public class Carrinho {
 	private Long id;
 	
 	@ManyToOne(optional = false)
+	@JsonIgnore
 	@JoinColumn(name = "usuario_id")
 	private Usuario usuario;
 	
