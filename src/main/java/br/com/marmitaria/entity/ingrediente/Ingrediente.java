@@ -1,7 +1,10 @@
 package br.com.marmitaria.entity.ingrediente;
 
+import br.com.marmitaria.enums.CategoriaIngrediente;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,6 +27,7 @@ public class Ingrediente {
 	@Column(nullable = false, length = 50)
 	private String nome;
 	
-	@Column(nullable = false, length = 20)
-	private String categoria;
+	@Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CategoriaIngrediente categoria;
 }

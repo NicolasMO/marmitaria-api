@@ -41,4 +41,20 @@ public class Carrinho {
 	
 	@Column(nullable = false)
 	private Double valorTotal = 0.0;
+	
+	public void adicionarItem(ItemCarrinho item) {
+	    this.itens.add(item);
+	    recalcularValorTotal();
+	}
+
+	public void removerItem(ItemCarrinho item) {
+	    this.itens.remove(item);
+	    recalcularValorTotal();
+	}
+
+	public void recalcularValorTotal() {
+	    this.valorTotal = this.itens.stream()
+	        .mapToDouble(item -> item.getPreco() * item.getQuantidade())
+	        .sum();
+	}
 }

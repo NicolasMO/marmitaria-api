@@ -2,6 +2,7 @@ package br.com.marmitaria.entity.carrinho;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import br.com.marmitaria.entity.produto.Marmita;
 import br.com.marmitaria.entity.produto.Produto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,6 +35,10 @@ public class ItemCarrinho {
     @ManyToOne
     @JoinColumn(name = "produto_id", nullable = false)
     private Produto produto;
+    
+    @ManyToOne
+    @JoinColumn(name = "marmita_id")
+    private Marmita marmita;
 
     @Column(nullable = false)
     private Integer quantidade;
@@ -41,4 +46,7 @@ public class ItemCarrinho {
     @Column(nullable = false)
     private Double preco;
     
+    public void atualizarQuantidade(int novaQuantidade) {
+        this.quantidade = novaQuantidade;
+    }
 }

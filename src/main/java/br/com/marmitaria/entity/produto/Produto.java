@@ -1,7 +1,10 @@
 package br.com.marmitaria.entity.produto;
 
+import br.com.marmitaria.enums.TipoProduto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,10 +27,10 @@ public class Produto {
 	@Column(nullable = false, length = 50)
 	private String nome;
 	
-	@Column(nullable = false, length = 15)
-	private String tipo;
-	
 	@Column(nullable = false)
 	private Double preco;
 
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, length = 20)
+	private TipoProduto tipo;
 }
