@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.marmitaria.dto.carrinho.AdicionarItemCarrinhoDTO;
 import br.com.marmitaria.dto.carrinho.ItemCarrinhoDTO;
-import br.com.marmitaria.entity.carrinho.Carrinho;
 import br.com.marmitaria.service.carrinho.CarrinhoService;
 
 @RestController
@@ -23,12 +22,6 @@ public class CarrinhoController {
 	public CarrinhoController(CarrinhoService carrinhoService) {
 		this.carrinhoService = carrinhoService;
 	}
-	
-	@GetMapping("/{usuarioId}")
-    public ResponseEntity<Carrinho> getCarrinho(@PathVariable Long usuarioId) {
-            Carrinho carrinho = carrinhoService.buscarCarrinhoPorUsuario(usuarioId);
-            return ResponseEntity.ok(carrinho);
-    }
 	
 	@GetMapping("/{usuarioId}/itens")
     public ResponseEntity<List<ItemCarrinhoDTO>> listarItensCarrinho(@PathVariable Long usuarioId) {

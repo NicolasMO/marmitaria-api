@@ -1,8 +1,10 @@
 package br.com.marmitaria.dto.produto;
 
-import java.util.List;
+import java.util.Map;
 
-import br.com.marmitaria.enums.TipoProduto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,10 +12,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProdutoDTO {
+	@JsonIgnore
 	private Long id;
-	private String nome;
-	private TipoProduto tipo;
-	private Double preco;
-	private List<IngredienteDTO> ingredientes; 
+	private String nome; 
+	private Double preco; 
+	private Map<String, String> ingredientes;
 }

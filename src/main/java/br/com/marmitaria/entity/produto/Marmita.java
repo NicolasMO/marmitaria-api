@@ -3,6 +3,8 @@ package br.com.marmitaria.entity.produto;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import br.com.marmitaria.entity.usuario.Usuario;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -35,7 +37,8 @@ public class Marmita {
 	@OneToMany(mappedBy = "marmita", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MarmitaIngrediente> ingredientes = new ArrayList<>();
 	
-	 @ManyToOne
+	@ManyToOne
+	@JsonIgnore
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 }

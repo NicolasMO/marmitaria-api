@@ -1,5 +1,7 @@
 package br.com.marmitaria.entity.produto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import br.com.marmitaria.entity.ingrediente.Ingrediente;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,6 +26,7 @@ public class MarmitaIngrediente {
 	private Long id;
 	
 	@ManyToOne
+	@JsonIgnore
 	@JoinColumn(name = "marmita_id", nullable = false)
 	private Marmita marmita;
 	

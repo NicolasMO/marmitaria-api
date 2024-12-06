@@ -1,49 +1,51 @@
 package br.com.marmitaria.service.carrinho;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import javax.management.RuntimeErrorException;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import br.com.marmitaria.dto.carrinho.AdicionarItemCarrinhoDTO;
 import br.com.marmitaria.dto.carrinho.ItemCarrinhoDTO;
+import br.com.marmitaria.dto.carrinho.ItemCarrinhoProjection;
 import br.com.marmitaria.dto.carrinho.QtdItemCarrinhoDTO;
-import br.com.marmitaria.dto.produto.IngredienteDTO;
+import br.com.marmitaria.dto.produto.MarmitaIngredienteProjection;
 import br.com.marmitaria.dto.produto.ProdutoDTO;
 import br.com.marmitaria.entity.carrinho.Carrinho;
 import br.com.marmitaria.entity.carrinho.ItemCarrinho;
 import br.com.marmitaria.entity.produto.Marmita;
-import br.com.marmitaria.entity.produto.MarmitaIngrediente;
 import br.com.marmitaria.entity.produto.Produto;
 import br.com.marmitaria.entity.usuario.Usuario;
+import br.com.marmitaria.enums.CategoriaIngrediente;
+import br.com.marmitaria.enums.TipoProduto;
 import br.com.marmitaria.repository.carrinho.CarrinhoRepository;
 import br.com.marmitaria.repository.carrinho.ItemCarrinhoRepository;
-import br.com.marmitaria.repository.produto.IngredienteRepository;
-import br.com.marmitaria.repository.produto.MarmitaRepository;
+import br.com.marmitaria.repository.produto.MarmitaIngredienteRepository;
 import br.com.marmitaria.repository.produto.ProdutoRepository;
 import br.com.marmitaria.repository.usuario.UsuarioRepository;
+import br.com.marmitaria.service.produto.MarmitaService;
 
 @Service
 public class CarrinhoServiceImpl implements CarrinhoService {
 
 	private final CarrinhoRepository carrinhoRepository;
 	private final ItemCarrinhoRepository itemCarrinhoRepository;
-	private final MarmitaRepository marmitaRepository;
+	private final MarmitaService marmitaService;
+	private final MarmitaIngredienteRepository marmitaIngredienteRepository;
 	private final ProdutoRepository produtoRepository;
 	private final UsuarioRepository usuarioRepository;
-	private final IngredienteRepository ingredienteRepository;
 
 	public CarrinhoServiceImpl(CarrinhoRepository carrinhoRepository, ItemCarrinhoRepository itemCarrinhoRepository,
-			ProdutoRepository produtoRepository, MarmitaRepository marmitaRepository,
-			UsuarioRepository usuarioRepository, IngredienteRepository ingredienteRepository) {
+			ProdutoRepository produtoRepository, MarmitaService marmitaService,
+			MarmitaIngredienteRepository marmitaIngredienteRepository, UsuarioRepository usuarioRepository) {
 		this.carrinhoRepository = carrinhoRepository;
 		this.itemCarrinhoRepository = itemCarrinhoRepository;
 		this.produtoRepository = produtoRepository;
-		this.marmitaRepository = marmitaRepository;
+		this.marmitaService = marmitaService;
+		this.marmitaIngredienteRepository = marmitaIngredienteRepository;
 		this.usuarioRepository = usuarioRepository;
-		this.ingredienteRepository= ingredienteRepository;
 	}
 
 	public Carrinho buscarCarrinhoPorUsuario(Long usuarioId) {
@@ -57,76 +59,114 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 	}
 
 	public List<ItemCarrinhoDTO> listarItensCarrinho(Long carrinhoId) {
-		Carrinho carrinho = carrinhoRepository.findById(carrinhoId)
-				.orElseThrow(() -> new RuntimeException("Carrinho não encontrado"));
+		List<ItemCarrinhoProjection> itensCarrinho = itemCarrinhoRepository.findByCarrinhoId(carrinhoId);
 
-		List<ItemCarrinhoDTO> itensDTO = new ArrayList<>();
-		for (ItemCarrinho item : carrinho.getItens()) {
-			ItemCarrinhoDTO itemDTO = new ItemCarrinhoDTO();
-			ProdutoDTO produtoDTO = new ProdutoDTO();
-			produtoDTO.setId(item.getProduto().getId());
-			produtoDTO.setNome(item.getProduto().getNome());
-			produtoDTO.setPreco(item.getProduto().getPreco());
-			produtoDTO.setTipo(item.getProduto().getTipo());
+		List<Long> marmitaIds = itensCarrinho.stream().filter(item -> item.getMarmitaId() != null)
+				.map(ItemCarrinhoProjection::getMarmitaId).collect(Collectors.toList());
 
-			itemDTO.setProduto(produtoDTO);
-			itemDTO.setQuantidade(item.getQuantidade());
-			itemDTO.setPreco(item.getPreco());
+		List<MarmitaIngredienteProjection> ingredientes = marmitaIngredienteRepository.findByMarmitaIds(marmitaIds);
 
-			if (item.getMarmita() != null) {
-				Marmita marmita = item.getMarmita();
-				List<IngredienteDTO> ingredientesDTO = new ArrayList<>();
-				for (MarmitaIngrediente marmitaIngrediente : marmita.getIngredientes()) {
-					IngredienteDTO ingredienteDTO = new IngredienteDTO();
-					ingredienteDTO.setNome(marmitaIngrediente.getIngrediente().getNome());
-					ingredienteDTO.setCategoria(marmitaIngrediente.getIngrediente().getCategoria());
-					ingredientesDTO.add(ingredienteDTO);
-				}
-				itemDTO.setIngredientes(ingredientesDTO);
-			}
+		// Mapear os ingredientes para suas marmitas e categorias
+		Map<Long, Map<String, String>> ingredientesPorMarmita = ingredientes.stream().collect(
+			    Collectors.groupingBy(MarmitaIngredienteProjection::getMarmitaId, Collectors.groupingBy(ingrediente -> {
+			        String categoriaNome = ingrediente.getIngredienteCategoria();
+			        
+			        CategoriaIngrediente categoria = CategoriaIngrediente.valueOf(categoriaNome);
+			        return categoria.name().toLowerCase();
+			    }, Collectors.mapping(MarmitaIngredienteProjection::getIngredienteNome, Collectors.joining(", "))))
+			);
 
-			itensDTO.add(itemDTO);
-		}
+		return itensCarrinho.stream().map(item -> {
+			ProdutoDTO produto = new ProdutoDTO(item.getId(), item.getProdutoNome(), item.getItemPreco(),
+					item.getMarmitaId() != null ? formatarIngredientes(ingredientesPorMarmita.get(item.getMarmitaId()))
+							: null);
 
-		return itensDTO;
+			return new ItemCarrinhoDTO(item.getId(), produto, item.getQuantidade(), item.getItemPreco());
+		}).collect(Collectors.toList());
 	}
 
 	public void adicionarItemCarrinho(AdicionarItemCarrinhoDTO dto) {
 		Carrinho carrinho = carrinhoRepository.findByUsuarioId(dto.getUsuarioId())
 				.orElseGet(() -> criarCarrinhoParaUsuario(dto.getUsuarioId()));
-		
-	    Produto produto = produtoRepository.findById(dto.getProdutoId())
-	    		.orElseThrow(() -> new RuntimeException("Produto não encontrado."));
-	    
-	    QtdItemCarrinhoDTO itemExistente = itemCarrinhoRepository.buscarQuantidadeDoProduto(carrinho.getId(), dto.getProdutoId());
-	    
-	    if (itemExistente != null) {
-	    	ItemCarrinho itemCarrinho = itemCarrinhoRepository.findByCarrinhoAndProduto(carrinho.getId(), dto.getProdutoId())
-	    			.orElseThrow(() -> new RuntimeException("Erro ao buscar item"));
-    		itemCarrinho.setQuantidade(dto.getQuantidade());
-    		itemCarrinho.setPreco(produto.getPreco() * dto.getQuantidade());
-    		itemCarrinhoRepository.save(itemCarrinho);
-	    } else {
-	    	ItemCarrinho novoItem = new ItemCarrinho();
-	    	novoItem.setCarrinho(carrinho);
-	    	novoItem.setProduto(produto);
-	    	novoItem.setQuantidade(dto.getQuantidade());
-	    	novoItem.setPreco(produto.getPreco() * dto.getQuantidade());
-	    	
-	    	carrinho.adicionarItem(novoItem);
-	        itemCarrinhoRepository.save(novoItem);
-	    }
-	    
-	    carrinho.recalcularValorTotal(); 
-	    carrinhoRepository.save(carrinho);
+
+		Produto produto = produtoRepository.findById(dto.getProdutoId())
+				.orElseThrow(() -> new RuntimeException("Produto não encontrado."));
+
+		if (produto.getTipo() != TipoProduto.BEBIDA) {
+			Marmita marmita = marmitaService.montarMarmita(dto.getMarmitaDTO());
+			adicionarMarmitaAoCarrinho(carrinho, marmita);
+		} else {
+			adicionarBebidaAoCarrinho(carrinho, produto, dto.getQuantidade());
+		}
+
+		carrinho.recalcularValorTotal();
+		carrinhoRepository.save(carrinho);
 
 	}
 
+	// Metodos privados
+
+	private void adicionarMarmitaAoCarrinho(Carrinho carrinho, Marmita marmita) {
+		ItemCarrinho itemCarrinho = new ItemCarrinho();
+		itemCarrinho.setCarrinho(carrinho);
+		itemCarrinho.setProduto(marmita.getProduto());
+		itemCarrinho.setMarmita(marmita);
+		itemCarrinho.setQuantidade(1);
+		itemCarrinho.setPreco(marmita.getProduto().getPreco());
+		itemCarrinhoRepository.save(itemCarrinho);
+		carrinho.adicionarItem(itemCarrinho);
+	}
+
+	private Map<String, String> formatarIngredientes(Map<String, String> ingredientesPorCategoria) {
+	    if (ingredientesPorCategoria == null || ingredientesPorCategoria.isEmpty()) return null;
+
+	    Map<String, String> ingredientesFormatados = new HashMap<>();
+
+	    for (CategoriaIngrediente categoria : CategoriaIngrediente.values()) {
+	        String categoriaNome = categoria.name().toLowerCase();
+	        String ingredientesCategoria = ingredientesPorCategoria.get(categoriaNome);
+	        
+	        if (ingredientesCategoria == null || ingredientesCategoria.isEmpty()) {
+	            ingredientesCategoria = "Sem complementos";
+	        }
+
+	        ingredientesFormatados.put(categoriaNome, ingredientesCategoria);
+	    }
+
+	    return ingredientesFormatados;
+	}
+
+
+
+	private void adicionarBebidaAoCarrinho(Carrinho carrinho, Produto produto, Integer quantidade) {
+		QtdItemCarrinhoDTO itemExistente = itemCarrinhoRepository.buscarQuantidadeDoProduto(carrinho.getId(),
+				produto.getId());
+
+		if (itemExistente != null) {
+			ItemCarrinho itemCarrinho = itemCarrinhoRepository
+					.findByCarrinhoAndProduto(carrinho.getId(), produto.getId())
+					.orElseThrow(() -> new RuntimeException("Erro ao buscar item"));
+			itemCarrinho.setQuantidade(quantidade);
+			itemCarrinho.setPreco(produto.getPreco() * quantidade);
+			itemCarrinhoRepository.save(itemCarrinho);
+		} else {
+			ItemCarrinho novoItem = new ItemCarrinho();
+			novoItem.setCarrinho(carrinho);
+			novoItem.setProduto(produto);
+			novoItem.setQuantidade(quantidade);
+			novoItem.setPreco(produto.getPreco() * quantidade);
+
+			carrinho.adicionarItem(novoItem);
+			itemCarrinhoRepository.save(novoItem);
+		}
+	}
+
 	private Carrinho criarCarrinhoParaUsuario(Long usuarioId) {
-		Usuario usuario = usuarioRepository.findById(usuarioId).orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
-	    Carrinho novoCarrinho = new Carrinho();
-	    novoCarrinho.setUsuario(usuario);
-	    return carrinhoRepository.save(novoCarrinho);
+		Usuario usuario = usuarioRepository.findById(usuarioId)
+				.orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+		Carrinho novoCarrinho = new Carrinho();
+		novoCarrinho.setUsuario(usuario);
+		return carrinhoRepository.save(novoCarrinho);
 	}
 
 }
