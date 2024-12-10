@@ -3,9 +3,11 @@ package br.com.marmitaria.service.carrinho;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.marmitaria.dto.carrinho.AdicionarItemCarrinhoDTO;
 import br.com.marmitaria.dto.carrinho.ItemCarrinhoDTO;
@@ -48,17 +50,10 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 		this.usuarioRepository = usuarioRepository;
 	}
 
-	public Carrinho buscarCarrinhoPorUsuario(Long usuarioId) {
-		Usuario usuario = usuarioRepository.findById(usuarioId)
-				.orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
-		Carrinho carrinho = carrinhoRepository.findByUsuario(usuario)
-				.orElseThrow(() -> new RuntimeException("Carrinho não encontrado para o usuário"));
-
-		return carrinho;
-	}
-
-	public List<ItemCarrinhoDTO> listarItensCarrinho(Long carrinhoId) {
+	public List<ItemCarrinhoDTO> listarItensDoCarrinho(Long carrinhoId) {
+		Carrinho carrinho = carrinhoRepository.findById(carrinhoId)
+				.orElseThrow(() -> new RuntimeException("Carrinho não encontrado."));
+		
 		List<ItemCarrinhoProjection> itensCarrinho = itemCarrinhoRepository.findByCarrinhoId(carrinhoId);
 
 		List<Long> marmitaIds = itensCarrinho.stream().filter(item -> item.getMarmitaId() != null)
@@ -66,7 +61,6 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 
 		List<MarmitaIngredienteProjection> ingredientes = marmitaIngredienteRepository.findByMarmitaIds(marmitaIds);
 
-		// Mapear os ingredientes para suas marmitas e categorias
 		Map<Long, Map<String, String>> ingredientesPorMarmita = ingredientes.stream().collect(
 			    Collectors.groupingBy(MarmitaIngredienteProjection::getMarmitaId, Collectors.groupingBy(ingrediente -> {
 			        String categoriaNome = ingrediente.getIngredienteCategoria();
@@ -85,7 +79,8 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 		}).collect(Collectors.toList());
 	}
 
-	public void adicionarItemCarrinho(AdicionarItemCarrinhoDTO dto) {
+	@Transactional
+	public void adicionarItemAoCarrinho(AdicionarItemCarrinhoDTO dto) {
 		Carrinho carrinho = carrinhoRepository.findByUsuarioId(dto.getUsuarioId())
 				.orElseGet(() -> criarCarrinhoParaUsuario(dto.getUsuarioId()));
 
@@ -103,6 +98,16 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 		carrinhoRepository.save(carrinho);
 
 	}
+	
+	@Transactional
+	public void limparCarrinho(Long carrinhoId) {
+		itemCarrinhoRepository.limparCarrinho(carrinhoId);
+	}
+	
+	@Transactional
+	public void removerItemDoCarrinho(Long itemId, Long carrinhoId) {
+		itemCarrinhoRepository.removerItemDoCarrinho(itemId, carrinhoId);
+	}
 
 	// Metodos privados
 
@@ -116,30 +121,9 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 		itemCarrinhoRepository.save(itemCarrinho);
 		carrinho.adicionarItem(itemCarrinho);
 	}
-
-	private Map<String, String> formatarIngredientes(Map<String, String> ingredientesPorCategoria) {
-	    if (ingredientesPorCategoria == null || ingredientesPorCategoria.isEmpty()) return null;
-
-	    Map<String, String> ingredientesFormatados = new HashMap<>();
-
-	    for (CategoriaIngrediente categoria : CategoriaIngrediente.values()) {
-	        String categoriaNome = categoria.name().toLowerCase();
-	        String ingredientesCategoria = ingredientesPorCategoria.get(categoriaNome);
-	        
-	        if (ingredientesCategoria == null || ingredientesCategoria.isEmpty()) {
-	            ingredientesCategoria = "Sem complementos";
-	        }
-
-	        ingredientesFormatados.put(categoriaNome, ingredientesCategoria);
-	    }
-
-	    return ingredientesFormatados;
-	}
-
-
-
+	
 	private void adicionarBebidaAoCarrinho(Carrinho carrinho, Produto produto, Integer quantidade) {
-		QtdItemCarrinhoDTO itemExistente = itemCarrinhoRepository.buscarQuantidadeDoProduto(carrinho.getId(),
+		QtdItemCarrinhoDTO itemExistente = itemCarrinhoRepository.buscarQuantidadeDoProdutoNoCarrinho(carrinho.getId(),
 				produto.getId());
 
 		if (itemExistente != null) {
@@ -159,6 +143,26 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 			carrinho.adicionarItem(novoItem);
 			itemCarrinhoRepository.save(novoItem);
 		}
+	}
+
+
+	private Map<String, String> formatarIngredientes(Map<String, String> ingredientesPorCategoria) {
+	    if (ingredientesPorCategoria == null || ingredientesPorCategoria.isEmpty()) return null;
+
+	    Map<String, String> ingredientesFormatados = new HashMap<>();
+
+	    for (CategoriaIngrediente categoria : CategoriaIngrediente.values()) {
+	        String categoriaNome = categoria.name().toLowerCase();
+	        String ingredientesCategoria = ingredientesPorCategoria.get(categoriaNome);
+	        
+	        if (ingredientesCategoria == null || ingredientesCategoria.isEmpty()) {
+	            ingredientesCategoria = "Sem complementos";
+	        }
+
+	        ingredientesFormatados.put(categoriaNome, ingredientesCategoria);
+	    }
+
+	    return ingredientesFormatados;
 	}
 
 	private Carrinho criarCarrinhoParaUsuario(Long usuarioId) {
