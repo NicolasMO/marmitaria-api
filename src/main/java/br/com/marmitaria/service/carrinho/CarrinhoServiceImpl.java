@@ -87,11 +87,11 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 		Produto produto = produtoRepository.findById(dto.getProdutoId())
 				.orElseThrow(() -> new RuntimeException("Produto não encontrado."));
 
-		if (produto.getTipo() != TipoProduto.BEBIDA) {
-			Marmita marmita = marmitaService.montarMarmita(dto.getMarmitaDTO());
-			adicionarMarmitaAoCarrinho(carrinho, marmita);
-		} else {
+		if (produto.getTipo() == TipoProduto.BEBIDA) {
 			adicionarBebidaAoCarrinho(carrinho, produto, dto.getQuantidade());
+		} else {
+			Marmita marmita = marmitaService.montarMarmita(dto.getMarmitaDTO(), dto.getProdutoId(), dto.getUsuarioId());
+			adicionarMarmitaAoCarrinho(carrinho, marmita);
 		}
 
 		carrinho.recalcularValorTotal();

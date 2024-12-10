@@ -36,15 +36,15 @@ public class MarmitaServiceImpl implements MarmitaService {
 		this.usuarioRepository = usuarioRepository;
 	}
 	
-	public Marmita montarMarmita(MarmitaDTO marmitaDTO) {
-		Produto produto = produtoRepository.findById(marmitaDTO.getProdutoId())
+	public Marmita montarMarmita(MarmitaDTO marmitaDTO, Long produtoId, Long usuarioId) {
+		Produto produto = produtoRepository.findById(produtoId)
 				.orElseThrow(() -> new RuntimeException("Produto não encontrado."));
 		
 		if(produto.getTipo() == BEBIDA) {
 			throw new IllegalArgumentException("O produto não é uma marmita.");
 		}
 		
-		Usuario usuario = usuarioRepository.findById(marmitaDTO.getUsuarioId())
+		Usuario usuario = usuarioRepository.findById(usuarioId)
 				.orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 		
 		QuantidadeIngredientes quantidadeIngredientes = produto.getTipo() == MARMITA_PEQUENA

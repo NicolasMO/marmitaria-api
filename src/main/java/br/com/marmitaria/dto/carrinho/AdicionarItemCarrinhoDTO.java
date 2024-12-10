@@ -9,7 +9,6 @@ import lombok.Data;
 public class AdicionarItemCarrinhoDTO {
 	private Long usuarioId;
 	private Long produtoId; 
+	private Integer quantidade;
     private MarmitaDTO marmitaDTO; 
-    private Integer quantidade;
-    private List<Long> ingredientesId;
 }
