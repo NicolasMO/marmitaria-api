@@ -29,6 +29,10 @@ public class Produto {
 	
 	@Column(nullable = false)
 	private Double preco;
+	
+	@Column(nullable = false)
+	private String imagem;
+	
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
