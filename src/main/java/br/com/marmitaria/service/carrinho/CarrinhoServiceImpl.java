@@ -96,7 +96,6 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 
 		carrinho.recalcularValorTotal();
 		carrinhoRepository.save(carrinho);
-
 	}
 	
 	@Transactional

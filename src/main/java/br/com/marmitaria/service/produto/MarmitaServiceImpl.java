@@ -68,8 +68,7 @@ public class MarmitaServiceImpl implements MarmitaService {
 		
 		marmita.getIngredientes().addAll(marmitaIngredientes);
 		
-		return marmitaRepository.save(marmita);
-		
+		return marmitaRepository.save(marmita);	
 	}
 
 	private void validarIngredientes(QuantidadeIngredientes quantidadeIngredientes, List<Ingrediente> ingredientes) {
@@ -77,9 +76,12 @@ public class MarmitaServiceImpl implements MarmitaService {
 		long carboidratos = ingredientes.stream().filter(i -> i.getCategoria() == CategoriaIngrediente.CARBOIDRATO).count();
 		long complementos = ingredientes.stream().filter(i -> i.getCategoria() == CategoriaIngrediente.COMPLEMENTO).count();
 		
-		if (proteinas == 0 || carboidratos == 0) {
-	        throw new IllegalArgumentException("Adicione ingredientes.");
+		if (proteinas == 0) {
+	        throw new IllegalArgumentException("Adicione proteínas.");
 	    }
+		if (carboidratos == 0) {
+			throw new IllegalArgumentException("Adicione carboidratos.");
+		}
 		
 		if (proteinas > quantidadeIngredientes.getMaxPorCategoria(CategoriaIngrediente.PROTEINA)) {
 			throw new IllegalArgumentException("Número máximo de proteínas atingido");
