@@ -3,7 +3,6 @@ package br.com.marmitaria.service.carrinho;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -51,6 +50,7 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 	}
 
 	public List<ItemCarrinhoDTO> listarItensDoCarrinho(Long carrinhoId) {
+		
 		Carrinho carrinho = carrinhoRepository.findById(carrinhoId)
 				.orElseThrow(() -> new RuntimeException("Carrinho não encontrado."));
 		
@@ -81,6 +81,8 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 
 	@Transactional
 	public void adicionarItemAoCarrinho(AdicionarItemCarrinhoDTO dto) {
+		
+		
 		Carrinho carrinho = carrinhoRepository.findByUsuarioId(dto.getUsuarioId())
 				.orElseGet(() -> criarCarrinhoParaUsuario(dto.getUsuarioId()));
 

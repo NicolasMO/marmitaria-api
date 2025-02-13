@@ -29,7 +29,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     	Optional<Usuario> usuario = usuarioRepository.findByEmail(loginRequest.getEmail());
     	
     	if(usuario.isPresent() && usuario.get().getSenha().equals(loginRequest.getSenha())) {
-    		String token = jwtUtil.gerarToken(usuario.get().getEmail());
+    		String token = jwtUtil.gerarToken(usuario.get());
     		return new LoginResponseDTO(token);
     	} else {
     		throw new RuntimeException("Usuário ou senha inválidos");

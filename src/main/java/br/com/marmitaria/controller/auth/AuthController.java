@@ -23,6 +23,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO LoginRequest) {
         LoginResponseDTO response = usuarioService.autenticar(LoginRequest);
+        System.out.println("Token gerado: " + response.getToken()); 
         return ResponseEntity.ok(response);
     }
 }
