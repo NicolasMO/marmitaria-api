@@ -109,6 +109,15 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 	public void removerItemDoCarrinho(Long itemId, Long carrinhoId) {
 		itemCarrinhoRepository.removerItemDoCarrinho(itemId, carrinhoId);
 	}
+	
+	@Override
+	public Carrinho criarCarrinhoParaUsuario(Long usuarioId) {
+		Usuario usuario = usuarioRepository.findById(usuarioId)
+				.orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+		Carrinho novoCarrinho = new Carrinho();
+		novoCarrinho.setUsuario(usuario);
+		return carrinhoRepository.save(novoCarrinho);
+	}
 
 	// Metodos privados
 
@@ -164,14 +173,6 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 	    }
 
 	    return ingredientesFormatados;
-	}
-
-	private Carrinho criarCarrinhoParaUsuario(Long usuarioId) {
-		Usuario usuario = usuarioRepository.findById(usuarioId)
-				.orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
-		Carrinho novoCarrinho = new Carrinho();
-		novoCarrinho.setUsuario(usuario);
-		return carrinhoRepository.save(novoCarrinho);
 	}
 
 }
