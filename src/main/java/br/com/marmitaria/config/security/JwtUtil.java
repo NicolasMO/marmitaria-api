@@ -29,7 +29,8 @@ public class JwtUtil {
 
     public String gerarToken(Usuario usuario) {
         return Jwts.builder()
-                .setSubject(usuario.getId().toString()).claim("email", usuario.getEmail().toString())
+                .setSubject(usuario.getId().toString())
+                .claim("email", usuario.getEmail().toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSecretKey(), SignatureAlgorithm.HS512)

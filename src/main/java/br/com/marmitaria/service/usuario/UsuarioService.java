@@ -9,7 +9,6 @@ import br.com.marmitaria.dto.usuario.CadastrarUsuarioDTO;
 import br.com.marmitaria.entity.usuario.Usuario;
 
 public interface UsuarioService {
-	LoginResponseDTO autenticar(LoginRequestDTO LoginRequest);
 	List<Usuario> buscarTodos();
 	Optional<Usuario> buscarUsuario(Long id);
 	Usuario cadastrarUsuario(CadastrarUsuarioDTO cadastrarUsuarioDTO);
