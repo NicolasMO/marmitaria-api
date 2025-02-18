@@ -1,5 +1,6 @@
 package br.com.marmitaria.config.security;
 
+import org.hibernate.Hibernate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -7,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import br.com.marmitaria.entity.usuario.Usuario;
 import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -31,10 +33,15 @@ public class JwtFilter extends OncePerRequestFilter {
 
 		String header = request.getHeader("Authorization");
 		if (header != null && header.startsWith("Bearer ")) {
-			UsernamePasswordAuthenticationToken auth = getAuthentication(header.substring(7));
-			if (auth != null) {
-				SecurityContextHolder.getContext().setAuthentication(auth);
-			}
+			 try {
+				String token = header.substring(7);
+	            UsernamePasswordAuthenticationToken auth = getAuthentication(token);
+	            if (auth != null) {
+	                SecurityContextHolder.getContext().setAuthentication(auth);
+	            	}
+		        } catch (Exception e) {
+		            System.out.println("Erro ao processar o token: " + e.getMessage());
+	        	}
 		}
 		chain.doFilter(request, response);
 	}
@@ -43,6 +50,7 @@ public class JwtFilter extends OncePerRequestFilter {
 		if (jwtUtil.tokenValido(token)) {
 			String username = jwtUtil.getClaim(token, "email");
 			UserDetails user = userDetailsService.loadUserByUsername(username);
+
 			return new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 		}
 		return null;

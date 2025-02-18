@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.marmitaria.config.security.JwtUtil;
-import br.com.marmitaria.dto.security.LoginRequestDTO;
-import br.com.marmitaria.dto.security.LoginResponseDTO;
 import br.com.marmitaria.dto.usuario.CadastrarUsuarioDTO;
-import br.com.marmitaria.entity.carrinho.Carrinho;
 import br.com.marmitaria.entity.usuario.Usuario;
 import br.com.marmitaria.repository.carrinho.CarrinhoRepository;
 import br.com.marmitaria.repository.usuario.UsuarioRepository;
@@ -30,21 +27,6 @@ public class UsuarioServiceImpl implements UsuarioService {
         this.carrinhoRepository = carrinhoRepository;
         this.carrinhoService = carrinhoService;
         this.jwtUtil = jwtUtil;
-    }
-	
-    @Override
-    public LoginResponseDTO autenticar(LoginRequestDTO loginRequest) {
-    	Optional<Usuario> usuario = usuarioRepository.findByEmail(loginRequest.getEmail());
-    	
-    	if(usuario.isPresent() && usuario.get().getSenha().equals(loginRequest.getSenha())) {
-    		String token = jwtUtil.gerarToken(usuario.get());
-    		Carrinho carrinho = carrinhoRepository.findByUsuarioId(usuario.get().getId())
-    				.orElseGet(() -> carrinhoService.criarCarrinhoParaUsuario(usuario.get().getId()));
-    		
-    		return new LoginResponseDTO(token, usuario.get().getNome(), usuario.get().getId(), carrinho.getId());
-    	} else {
-    		throw new RuntimeException("Usuário ou senha inválidos");
-    	}
     }
 	
 	@Override

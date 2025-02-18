@@ -8,21 +8,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.marmitaria.dto.security.LoginRequestDTO;
 import br.com.marmitaria.dto.security.LoginResponseDTO;
-import br.com.marmitaria.service.usuario.UsuarioService;
+import br.com.marmitaria.service.auth.AuthService;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
     
-    private final UsuarioService usuarioService;
+    private final AuthService authService;
 
-    public AuthController(UsuarioService usuarioService) {
-        this.usuarioService = usuarioService;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO LoginRequest) {
-        LoginResponseDTO response = usuarioService.autenticar(LoginRequest);
+        LoginResponseDTO response = authService.autenticar(LoginRequest);
         return ResponseEntity.ok(response);
     }
 }
