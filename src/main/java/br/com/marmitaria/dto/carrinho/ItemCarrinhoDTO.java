@@ -12,5 +12,5 @@ public class ItemCarrinhoDTO {
 	private Long id;
 	private ProdutoDTO produto;
 	private Integer quantidade;
-	private Double preco;
+	private Double precoTotal;
 	}

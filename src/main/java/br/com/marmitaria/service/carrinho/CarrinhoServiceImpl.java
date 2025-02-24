@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.marmitaria.dto.carrinho.AdicionarItemCarrinhoDTO;
+import br.com.marmitaria.dto.carrinho.CarrinhoResponseDTO;
 import br.com.marmitaria.dto.carrinho.ItemCarrinhoDTO;
 import br.com.marmitaria.dto.carrinho.ItemCarrinhoProjection;
 import br.com.marmitaria.dto.carrinho.QtdItemCarrinhoDTO;
@@ -49,11 +50,7 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 		this.usuarioRepository = usuarioRepository;
 	}
 
-	public List<ItemCarrinhoDTO> listarItensDoCarrinho(Long carrinhoId) {
-		
-		Carrinho carrinho = carrinhoRepository.findById(carrinhoId)
-				.orElseThrow(() -> new RuntimeException("Carrinho não encontrado."));
-		
+	public CarrinhoResponseDTO listarItensDoCarrinho(Long carrinhoId) {
 		List<ItemCarrinhoProjection> itensCarrinho = itemCarrinhoRepository.findByCarrinhoId(carrinhoId);
 
 		List<Long> marmitaIds = itensCarrinho.stream().filter(item -> item.getMarmitaId() != null)
@@ -62,27 +59,28 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 		List<MarmitaIngredienteProjection> ingredientes = marmitaIngredienteRepository.findByMarmitaIds(marmitaIds);
 
 		Map<Long, Map<String, String>> ingredientesPorMarmita = ingredientes.stream().collect(
-			    Collectors.groupingBy(MarmitaIngredienteProjection::getMarmitaId, Collectors.groupingBy(ingrediente -> {
-			        String categoriaNome = ingrediente.getIngredienteCategoria();
-			        
-			        CategoriaIngrediente categoria = CategoriaIngrediente.valueOf(categoriaNome);
-			        return categoria.name().toLowerCase();
-			    }, Collectors.mapping(MarmitaIngredienteProjection::getIngredienteNome, Collectors.joining(", "))))
-			);
+				Collectors.groupingBy(MarmitaIngredienteProjection::getMarmitaId, Collectors.groupingBy(ingrediente -> {
+					String categoriaNome = ingrediente.getIngredienteCategoria();
 
-		return itensCarrinho.stream().map(item -> {
+					CategoriaIngrediente categoria = CategoriaIngrediente.valueOf(categoriaNome);
+					return categoria.name().toLowerCase();
+				}, Collectors.mapping(MarmitaIngredienteProjection::getIngredienteNome, Collectors.joining(", ")))));
+
+		List<ItemCarrinhoDTO> itens = itensCarrinho.stream().map(item -> {
 			ProdutoDTO produto = new ProdutoDTO(item.getId(), item.getProdutoNome(), item.getItemPreco(),
 					item.getMarmitaId() != null ? formatarIngredientes(ingredientesPorMarmita.get(item.getMarmitaId()))
 							: null);
-
-			return new ItemCarrinhoDTO(item.getId(), produto, item.getQuantidade(), item.getItemPreco());
+			return new ItemCarrinhoDTO(item.getId(), produto, item.getQuantidade(),
+					item.getQuantidade() * item.getItemPreco());
 		}).collect(Collectors.toList());
+
+		Double valorTotal = itens.stream().mapToDouble(ItemCarrinhoDTO::getPrecoTotal).sum();
+
+		return new CarrinhoResponseDTO(itens, valorTotal);
 	}
 
 	@Transactional
 	public void adicionarItemAoCarrinho(AdicionarItemCarrinhoDTO dto) {
-		
-		
 		Carrinho carrinho = carrinhoRepository.findByUsuarioId(dto.getUsuarioId())
 				.orElseGet(() -> criarCarrinhoParaUsuario(dto.getUsuarioId()));
 
@@ -99,17 +97,17 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 		carrinho.recalcularValorTotal();
 		carrinhoRepository.save(carrinho);
 	}
-	
+
 	@Transactional
 	public void limparCarrinho(Long carrinhoId) {
 		itemCarrinhoRepository.limparCarrinho(carrinhoId);
 	}
-	
+
 	@Transactional
 	public void removerItemDoCarrinho(Long itemId, Long carrinhoId) {
 		itemCarrinhoRepository.removerItemDoCarrinho(itemId, carrinhoId);
 	}
-	
+
 	@Override
 	public Carrinho criarCarrinhoParaUsuario(Long usuarioId) {
 		Usuario usuario = usuarioRepository.findById(usuarioId)
@@ -131,7 +129,7 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 		itemCarrinhoRepository.save(itemCarrinho);
 		carrinho.adicionarItem(itemCarrinho);
 	}
-	
+
 	private void adicionarBebidaAoCarrinho(Carrinho carrinho, Produto produto, Integer quantidade) {
 		QtdItemCarrinhoDTO itemExistente = itemCarrinhoRepository.buscarQuantidadeDoProdutoNoCarrinho(carrinho.getId(),
 				produto.getId());
@@ -155,24 +153,24 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 		}
 	}
 
-
 	private Map<String, String> formatarIngredientes(Map<String, String> ingredientesPorCategoria) {
-	    if (ingredientesPorCategoria == null || ingredientesPorCategoria.isEmpty()) return null;
+		if (ingredientesPorCategoria == null || ingredientesPorCategoria.isEmpty())
+			return null;
 
-	    Map<String, String> ingredientesFormatados = new HashMap<>();
+		Map<String, String> ingredientesFormatados = new HashMap<>();
 
-	    for (CategoriaIngrediente categoria : CategoriaIngrediente.values()) {
-	        String categoriaNome = categoria.name().toLowerCase();
-	        String ingredientesCategoria = ingredientesPorCategoria.get(categoriaNome);
-	        
-	        if (ingredientesCategoria == null || ingredientesCategoria.isEmpty()) {
-	            ingredientesCategoria = "Sem complementos";
-	        }
+		for (CategoriaIngrediente categoria : CategoriaIngrediente.values()) {
+			String categoriaNome = categoria.name().toLowerCase();
+			String ingredientesCategoria = ingredientesPorCategoria.get(categoriaNome);
 
-	        ingredientesFormatados.put(categoriaNome, ingredientesCategoria);
-	    }
+			if (ingredientesCategoria == null || ingredientesCategoria.isEmpty()) {
+				ingredientesCategoria = "Sem complementos";
+			}
 
-	    return ingredientesFormatados;
+			ingredientesFormatados.put(categoriaNome, ingredientesCategoria);
+		}
+
+		return ingredientesFormatados;
 	}
 
 }

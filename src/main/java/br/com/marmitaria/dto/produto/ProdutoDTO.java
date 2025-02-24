@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class ProdutoDTO {
 	@JsonIgnore
 	private Long id;
-	private String nome; 
+	private String nome;
 	private Double preco; 
 	private Map<String, String> ingredientes;
 }

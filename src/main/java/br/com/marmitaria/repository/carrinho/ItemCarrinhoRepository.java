@@ -21,7 +21,7 @@ public interface ItemCarrinhoRepository extends JpaRepository<ItemCarrinho, Long
 	  QtdItemCarrinhoDTO buscarQuantidadeDoProdutoNoCarrinho(@Param(value = "carrinhoId") Long carrinhoId,
 												   @Param(value = "produtoId") Long produtoId);
 	  
-	  @Query(value = "SELECT  ic.id AS id, ic.quantidade AS quantidade, ic.preco AS item_preco, "
+	  @Query(value = "SELECT  ic.id AS id, ic.quantidade AS quantidade, p.preco AS item_preco, "
 			  + "p.nome AS produto_nome, ic.marmita_id "
 			  + "FROM item_carrinho ic "
 			  + "LEFT JOIN produto p ON ic.produto_id = p.id "
