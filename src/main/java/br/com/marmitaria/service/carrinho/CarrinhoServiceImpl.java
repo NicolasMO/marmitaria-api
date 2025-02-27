@@ -67,7 +67,7 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 				}, Collectors.mapping(MarmitaIngredienteProjection::getIngredienteNome, Collectors.joining(", ")))));
 
 		List<ItemCarrinhoDTO> itens = itensCarrinho.stream().map(item -> {
-			ProdutoDTO produto = new ProdutoDTO(item.getId(), item.getProdutoNome(), item.getItemPreco(),
+			ProdutoDTO produto = new ProdutoDTO(item.getProdutoId(), item.getProdutoNome(), item.getItemPreco(),
 					item.getMarmitaId() != null ? formatarIngredientes(ingredientesPorMarmita.get(item.getMarmitaId()))
 							: null);
 			return new ItemCarrinhoDTO(item.getId(), produto, item.getQuantidade(),
