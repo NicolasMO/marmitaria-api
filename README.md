@@ -5,8 +5,14 @@ Este repositório contém o **back-end** da aplicação de uma marmitaria, desen
  Link para o repositório do front-end: [marmitaria-web](https://github.com/NicolasMO/marmitaria-web)  
 
  
-Tecnologias Utilizadas
-Java 17, Spring Boot 3, JPA / Hibernate, Lombok, Spring Security, Banco de Dados PostgresSQL, CORS Configurado para Front-end.
+Tecnologias Utilizadas  
+Java 17  
+Spring Boot 3  
+JPA / Hibernate  
+Lombok  
+Spring Security  
+Banco de Dados PostgresSQL  
+CORS Configurado para Front-end.  
 
 Funcionalidades implementadas até o momento  
 ✅ Autenticação e login de usuários  
