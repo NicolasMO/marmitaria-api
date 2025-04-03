@@ -36,6 +36,79 @@ spring.jpa.hibernate.ddl-auto=update
 ```
 O servidor estará disponível em http://localhost:8080
 
+Principais endpoints  
+___
+Cadastro de Usuário
+POST /usuario
+```json
+{
+  "nome": "usuario",
+  "senha": "senha123",
+  "email": "usuario@example.com",
+  "celular": "99999999999"
+}
+```
+---
+Buscar Usuário 
+
+GET /usuario → Retorna todos os usuários
+
+GET /usuario/{id} → Retorna um usuário específico
+
+---
+Listar Produtos e Ingredientes
+
+GET /produtos → Lista todos os produtos
+
+GET /ingredientes → Lista todos os ingredientes
+
+---
+
+Adicionar Item ao Carrinho
+POST /carrinho/adicionar
+```json
+{
+  "usuarioId": 2,
+  "produtoId": 5,
+  "quantidade": 2
+}
+  ```
+
+Adicionar Marmita ao Carrinho
+POST /carrinho/adicionar
+
+```json
+{
+  "usuarioId": 2,
+  "produtoId": 1,
+  "quantidade": 1,
+  "marmitaDTO": {
+    "ingredientesId": []
+} 
+```
+  ---
+Listar Itens do Carrinho
+
+GET /carrinho/{usuarioId}
+
+Limpar Carrinho
+
+DELETE /carrinho/{usuarioId}
+
+Remover Item do Carrinho
+
+DELETE /carrinho/{usuarioId}/{itemId}
+
+---
+Autenticação (Login)
+POST /auth/login
+  ```json
+    "email": "usuario@example.com",
+    "senha": "senha123"
+```
+⚠ Importante: Algumas ações, como adicionar itens ao carrinho, exigem que o usuário esteja autenticado.
+
+
 Necessário popular o banco com os seguintes dados antes de iniciar o projeto:
 
 ```sql
