@@ -1,0 +1,21 @@
+CREATE TABLE usuario (
+    id BIGSERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    celular VARCHAR(11) NOT NULL,
+    senha VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE produto (
+    id BIGSERIAL PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL,
+    preco NUMERIC(10,2) NOT NULL,
+    imagem VARCHAR(255) NOT NULL,
+    tipo VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE ingrediente (
+    id BIGSERIAL PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL,
+    categoria VARCHAR(50) NOT NULL
+);
