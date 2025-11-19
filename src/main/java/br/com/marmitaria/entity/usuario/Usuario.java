@@ -1,20 +1,17 @@
 package br.com.marmitaria.entity.usuario;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import org.hibernate.validator.constraints.br.CPF;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import br.com.marmitaria.entity.endereco.Endereco;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,44 +28,57 @@ public class Usuario implements UserDetails {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	@Column(nullable = false, length = 100)
+
+    @NotBlank
+	@Column(nullable = false, length = 255)
 	private String nome;
-	
-	@Column(nullable = false, unique = true, length = 100)
+
+    @NotBlank
+    @Email
+	@Column(nullable = false, unique = true, length = 255)
 	private String email;
-	
+
+    @CPF
+    @Column(nullable = false, unique = true, length = 11)
+	private String cpf;
+
+    @NotBlank
 	@Column(nullable = false, length = 11)
 	private String celular;
-	
+
+    @NotBlank
 	@Column(nullable = false)
 	private String senha;
 	
-	@OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Endereco> enderecos;
 	
-	public Usuario(String nome, String senha, String celular, String email) {
+	public Usuario(String nome, String email, String cpf, String celular, String senha) {
 		this.nome = nome;
-		this.senha = senha;
-		this.celular = celular;
         this.email = email;
+        this.cpf = cpf;
+		this.celular = celular;
+		this.senha = senha;
     }
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		// TODO Auto-generated method stub
-		return null;
+		return Collections.emptyList();
 	}
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
 
 	@Override
 	public String getPassword() {
-		// TODO Auto-generated method stub
-		return null;
+		return senha;
 	}
 
-	@Override
-	public String getUsername() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override public boolean isAccountNonExpired() { return true; }
+    @Override public boolean isAccountNonLocked() { return true; }
+    @Override public boolean isCredentialsNonExpired() { return true; }
+    @Override public boolean isEnabled() { return true; }
+
 }

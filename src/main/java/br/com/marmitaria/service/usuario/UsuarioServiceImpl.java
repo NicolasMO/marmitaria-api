@@ -3,6 +3,8 @@ package br.com.marmitaria.service.usuario;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,24 +17,33 @@ import br.com.marmitaria.service.carrinho.CarrinhoService;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
-	
-	private final UsuarioRepository usuarioRepository;
+
+    @Autowired
+	private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    // Codigo antigo
+
 	private final CarrinhoRepository carrinhoRepository;
 	private final CarrinhoService carrinhoService;
     private final JwtUtil jwtUtil;
 
-    public UsuarioServiceImpl(UsuarioRepository usuarioRepository, CarrinhoRepository carrinhoRepository,
+
+
+    public UsuarioServiceImpl(CarrinhoRepository carrinhoRepository,
     							CarrinhoService carrinhoService, JwtUtil jwtUtil) {
-        this.usuarioRepository = usuarioRepository;
         this.carrinhoRepository = carrinhoRepository;
         this.carrinhoService = carrinhoService;
         this.jwtUtil = jwtUtil;
     }
-	
+
+    // Codigo antigo
+
 	@Override
 	public List<Usuario> buscarTodos() {
 		return usuarioRepository.findAll();
-		
 	}
 	
 	@Override
@@ -42,15 +53,32 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	@Transactional
-	public Usuario cadastrarUsuario(CadastrarUsuarioDTO cadastrarUsuarioDTO) {
-		Usuario usuario = new Usuario(
-				cadastrarUsuarioDTO.getNome(), 
-				cadastrarUsuarioDTO.getSenha(),
-				cadastrarUsuarioDTO.getCelular(),
-				cadastrarUsuarioDTO.getEmail()
-				);
+	public Usuario cadastrarUsuario(CadastrarUsuarioDTO dto) {
+		if (usuarioRepository.existsByEmail(dto.email())) {
+            throw new IllegalArgumentException("E-mail já cadastrado.");
+        }
 
-		System.out.println(usuario);
-		return usuarioRepository.save(usuario);
+        if (usuarioRepository.existsByCpf(dto.cpf())) {
+            throw new IllegalArgumentException(("CPF já cadastrado."));
+        }
+
+        Usuario usuario = new Usuario(
+                dto.nome(),
+                dto.email(),
+                dto.cpf(),
+                dto.celular(),
+                passwordEncoder.encode(dto.senha())
+        );
+
+        return usuarioRepository.save(usuario);
 	}
+
+    @Override
+    @Transactional
+    public void removerUsuario(long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        usuarioRepository.delete(usuario);
+    }
 }

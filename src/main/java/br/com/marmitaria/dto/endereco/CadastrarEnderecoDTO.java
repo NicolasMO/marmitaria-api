@@ -1,15 +1,16 @@
 package br.com.marmitaria.dto.endereco;
 
-import lombok.Data;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
-@Data
-public class CadastrarEnderecoDTO {
-	private String logradouro;
-	private String numero;
-	private String bairro;
-	private String cidade;
-	private String estado;
-	private String complemento;
-	private String cep;
-	private Long usuarioId;
-}
+public record CadastrarEnderecoDTO(
+        @NotBlank
+        String cep,
+
+        @NotBlank
+        String numero,
+
+        String complemento
+) {}

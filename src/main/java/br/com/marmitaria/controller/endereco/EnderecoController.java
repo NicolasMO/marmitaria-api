@@ -1,31 +1,41 @@
 package br.com.marmitaria.controller.endereco;
 
+import br.com.marmitaria.dto.endereco.RespostaEnderecoDTO;
+import br.com.marmitaria.entity.usuario.Response;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import br.com.marmitaria.dto.endereco.CadastrarEnderecoDTO;
 import br.com.marmitaria.entity.endereco.Endereco;
 import br.com.marmitaria.service.endereco.EnderecoService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("endereco")
 public class EnderecoController {
 	
-	private final EnderecoService enderecoService;
-	
-	public EnderecoController(EnderecoService enderecoService) {
-		this.enderecoService = enderecoService;
+	@Autowired
+    EnderecoService enderecoService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<List<RespostaEnderecoDTO>> listarEnderecosDoUsuario(@PathVariable long id) {
+        List<RespostaEnderecoDTO> endereco = enderecoService.listarEnderecosDoUsuario(id);
+        return ResponseEntity.status(HttpStatus.OK).body(endereco);
+    }
+
+	@PostMapping("/{id}")
+	public ResponseEntity<Endereco> cadastrarEndereco(@PathVariable long id, @Valid @RequestBody CadastrarEnderecoDTO dto) {
+		Endereco endereco = enderecoService.cadastrarEndereco(id, dto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(endereco);
 	}
-	
-	//Endpoints
-	
-	@PostMapping
-	public ResponseEntity<Endereco> cadastrarEndereco(@RequestBody CadastrarEnderecoDTO cadastrarEnderecoDTO) {
-		enderecoService.cadastrarEndereco(cadastrarEnderecoDTO);
-		return new ResponseEntity<Endereco>(HttpStatus.CREATED);
-	}
+
+    @DeleteMapping("/{usuarioId}/{id}")
+    public ResponseEntity<String> removerEndereco(@PathVariable long usuarioId, @PathVariable long id) {
+        enderecoService.removerEnderecoDoUsuario(usuarioId, id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Endereço removido com sucesso");
+    }
 }

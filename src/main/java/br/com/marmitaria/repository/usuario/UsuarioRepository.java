@@ -11,6 +11,9 @@ import br.com.marmitaria.entity.usuario.Usuario;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+    boolean existsByEmail(String email);
+    boolean existsByCpf(String cpf);
+
 	@Query("SELECT u FROM Usuario u WHERE u.email = :email")
 	Optional<Usuario> findByEmail(@Param("email") String email);
 }

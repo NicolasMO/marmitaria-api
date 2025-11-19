@@ -12,4 +12,5 @@ public interface UsuarioService {
 	List<Usuario> buscarTodos();
 	Optional<Usuario> buscarUsuario(Long id);
 	Usuario cadastrarUsuario(CadastrarUsuarioDTO cadastrarUsuarioDTO);
+    void removerUsuario(long id);
 }
