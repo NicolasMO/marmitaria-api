@@ -74,6 +74,7 @@ public class IngredienteServiceImpl implements IngredienteService {
     }
 
     @Override
+    @Transactional
     public void removerIngrediente(Long id) {
         Ingrediente ingrediente = ingredienteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ingrediente não encontrado."));

@@ -9,12 +9,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Entity
 @Data
+@NoArgsConstructor
 @Table(name = "produto")
 public class Produto {
 	
@@ -27,8 +30,11 @@ public class Produto {
 	private String nome;
 
     @NotNull
-	@Column(nullable = false)
-	private Double preco_unitario;
+    @Digits(integer = 4, fraction = 2)
+    @DecimalMin("0.00")
+    @DecimalMax("9999.99")
+	@Column(nullable = false, precision = 6, scale = 2)
+	private BigDecimal preco_unitario;
 
     @NotBlank
 	@Column(nullable = false)
@@ -38,7 +44,14 @@ public class Produto {
 	@Column(nullable = false, length = 20)
 	private TipoProduto tipo;
 
-    public Produto (String nome, Double preco_unitario, String imagem, TipoProduto tipo) {
+    public Produto (String nome, BigDecimal preco_unitario, String imagem, TipoProduto tipo) {
+        this.nome = nome;
+        this.preco_unitario = preco_unitario;
+        this.imagem = imagem;
+        this.tipo = tipo;
+    }
+
+    public void atualizarDados(String nome, BigDecimal preco_unitario, String imagem, TipoProduto tipo) {
         this.nome = nome;
         this.preco_unitario = preco_unitario;
         this.imagem = imagem;
