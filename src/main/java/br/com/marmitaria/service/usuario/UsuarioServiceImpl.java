@@ -9,11 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.marmitaria.config.security.JwtUtil;
-import br.com.marmitaria.dto.usuario.CadastrarUsuarioDTO;
+import br.com.marmitaria.dto.usuario.CadastroUsuarioDTO;
 import br.com.marmitaria.entity.usuario.Usuario;
-import br.com.marmitaria.repository.carrinho.CarrinhoRepository;
 import br.com.marmitaria.repository.usuario.UsuarioRepository;
-import br.com.marmitaria.service.carrinho.CarrinhoService;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
@@ -26,23 +24,18 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     // Codigo antigo
 
-	private final CarrinhoRepository carrinhoRepository;
-	private final CarrinhoService carrinhoService;
     private final JwtUtil jwtUtil;
 
 
 
-    public UsuarioServiceImpl(CarrinhoRepository carrinhoRepository,
-    							CarrinhoService carrinhoService, JwtUtil jwtUtil) {
-        this.carrinhoRepository = carrinhoRepository;
-        this.carrinhoService = carrinhoService;
+    public UsuarioServiceImpl(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
     }
 
     // Codigo antigo
 
 	@Override
-	public List<Usuario> buscarTodos() {
+	public List<Usuario> listarTodos() {
 		return usuarioRepository.findAll();
 	}
 	
@@ -53,7 +46,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	@Transactional
-	public Usuario cadastrarUsuario(CadastrarUsuarioDTO dto) {
+	public Usuario cadastrarUsuario(CadastroUsuarioDTO dto) {
 		if (usuarioRepository.existsByEmail(dto.email())) {
             throw new IllegalArgumentException("E-mail já cadastrado.");
         }

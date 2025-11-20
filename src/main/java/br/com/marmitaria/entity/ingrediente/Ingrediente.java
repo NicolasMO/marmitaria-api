@@ -9,25 +9,33 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "ingrediente")
 public class Ingrediente {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	@Column(nullable = false, length = 50)
+
+    @NotBlank
+	@Column(nullable = false, length = 100)
 	private String nome;
 	
 	@Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CategoriaIngrediente categoria;
+
+    public Ingrediente (String nome, CategoriaIngrediente categoria) {
+        this.nome = nome;
+        this.categoria = categoria;
+    }
+
+    public void atualizarDados (String nome, CategoriaIngrediente categoria) {
+        this.nome = nome;
+        this.categoria = categoria;
+    }
 }

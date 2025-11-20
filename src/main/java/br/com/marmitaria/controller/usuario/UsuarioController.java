@@ -1,6 +1,5 @@
 package br.com.marmitaria.controller.usuario;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import br.com.marmitaria.dto.usuario.CadastrarUsuarioDTO;
+import br.com.marmitaria.dto.usuario.CadastroUsuarioDTO;
 import br.com.marmitaria.entity.usuario.Usuario;
 import br.com.marmitaria.service.usuario.UsuarioService;
 
@@ -23,7 +22,7 @@ public class UsuarioController {
 	
 	@GetMapping
 	public ResponseEntity<?> buscarTodos() {
-		List<Usuario> usuarios = usuarioService.buscarTodos();
+		List<Usuario> usuarios = usuarioService.listarTodos();
 		return ResponseEntity.ok(usuarios);
 	}
 	
@@ -34,8 +33,8 @@ public class UsuarioController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<Usuario> cadastrarUsuario(@Valid @RequestBody CadastrarUsuarioDTO cadastrarUsuarioDTO) {
-		Usuario criado = usuarioService.cadastrarUsuario(cadastrarUsuarioDTO);
+	public ResponseEntity<Usuario> cadastrarUsuario(@Valid @RequestBody CadastroUsuarioDTO cadastroUsuarioDTO) {
+		Usuario criado = usuarioService.cadastrarUsuario(cadastroUsuarioDTO);
 		return ResponseEntity.status(HttpStatus.CREATED).body(criado);
 	}
 

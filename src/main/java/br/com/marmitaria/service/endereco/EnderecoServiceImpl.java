@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.marmitaria.dto.endereco.CadastrarEnderecoDTO;
+import br.com.marmitaria.dto.endereco.CadastroEnderecoDTO;
 import br.com.marmitaria.entity.endereco.Endereco;
 import br.com.marmitaria.entity.usuario.Usuario;
 import br.com.marmitaria.repository.endereco.EnderecoRepository;
@@ -30,7 +30,7 @@ public class EnderecoServiceImpl implements EnderecoService {
 	
 	@Override
 	@Transactional
-	public Endereco cadastrarEndereco(Long usuarioId, CadastrarEnderecoDTO dto) {
+	public Endereco cadastrarEndereco(Long usuarioId, CadastroEnderecoDTO dto) {
 		Usuario usuario = usuarioRepository.findById(usuarioId)
 				.orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 

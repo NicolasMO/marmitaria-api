@@ -1,14 +1,13 @@
 package br.com.marmitaria.controller.endereco;
 
 import br.com.marmitaria.dto.endereco.RespostaEnderecoDTO;
-import br.com.marmitaria.entity.usuario.Response;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import br.com.marmitaria.dto.endereco.CadastrarEnderecoDTO;
+import br.com.marmitaria.dto.endereco.CadastroEnderecoDTO;
 import br.com.marmitaria.entity.endereco.Endereco;
 import br.com.marmitaria.service.endereco.EnderecoService;
 
@@ -28,7 +27,7 @@ public class EnderecoController {
     }
 
 	@PostMapping("/{id}")
-	public ResponseEntity<Endereco> cadastrarEndereco(@PathVariable long id, @Valid @RequestBody CadastrarEnderecoDTO dto) {
+	public ResponseEntity<Endereco> cadastrarEndereco(@PathVariable long id, @Valid @RequestBody CadastroEnderecoDTO dto) {
 		Endereco endereco = enderecoService.cadastrarEndereco(id, dto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(endereco);
 	}
