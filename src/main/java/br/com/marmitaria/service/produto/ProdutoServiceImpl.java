@@ -1,5 +1,6 @@
 package br.com.marmitaria.service.produto;
 
+import br.com.marmitaria.dto.produto.AtualizarProdutoDTO;
 import br.com.marmitaria.dto.produto.CadastroProdutoDTO;
 import br.com.marmitaria.dto.produto.RespostaProdutoDTO;
 import br.com.marmitaria.entity.produto.Produto;
@@ -19,6 +20,10 @@ public class ProdutoServiceImpl implements ProdutoService {
     @Override
     @Transactional
     public Produto cadastrarProduto(CadastroProdutoDTO dto) {
+        if (produtoRepository.existsByNomeIgnoreCase(dto.nome())) {
+            throw new IllegalArgumentException("Já existe um produto com este nome.");
+        }
+
         Produto produto = new Produto(
                 dto.nome(),
                 dto.preco_unitario(),
@@ -44,11 +49,15 @@ public class ProdutoServiceImpl implements ProdutoService {
 
     @Override
     @Transactional
-    public RespostaProdutoDTO atualizarProduto(Long id, CadastroProdutoDTO dto) {
+    public RespostaProdutoDTO atualizarProduto(Long id, AtualizarProdutoDTO dto) {
+        if (produtoRepository.existsByNomeIgnoreCase(dto.nome())) {
+            throw new IllegalArgumentException("Já existe um produto com este nome.");
+        }
+
         Produto produto = produtoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
 
-        produto.atualizarDados(dto.nome(), dto.preco_unitario(), dto.imagem(), dto.tipo());
+        produto.atualizarDados(dto.nome(), dto.preco_unitario(), dto.tipo());
         produtoRepository.save(produto);
 
         return new RespostaProdutoDTO(

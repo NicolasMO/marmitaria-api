@@ -34,6 +34,10 @@ public class EnderecoServiceImpl implements EnderecoService {
 		Usuario usuario = usuarioRepository.findById(usuarioId)
 				.orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 
+        if (enderecoRepository.existsByUsuarioIdAndNumeroAndComplementoIgnoreCase(usuarioId, dto.numero(), dto.complemento())) {
+            throw new RuntimeException("Endereço já cadastrado.");
+        }
+
         if (usuario.getEnderecos().size() >= 3) {
             throw new RuntimeException(("Máximo de 3 endereços cadastrados."));
         }

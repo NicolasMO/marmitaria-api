@@ -51,10 +51,9 @@ public class Produto {
         this.tipo = tipo;
     }
 
-    public void atualizarDados(String nome, BigDecimal preco_unitario, String imagem, TipoProduto tipo) {
+    public void atualizarDados(String nome, BigDecimal preco_unitario, TipoProduto tipo) {
         this.nome = nome;
         this.preco_unitario = preco_unitario;
-        this.imagem = imagem;
         this.tipo = tipo;
     }
 }

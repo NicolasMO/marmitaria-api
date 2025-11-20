@@ -1,5 +1,6 @@
 package br.com.marmitaria.service.produto;
 
+import br.com.marmitaria.dto.produto.AtualizarProdutoDTO;
 import br.com.marmitaria.dto.produto.CadastroProdutoDTO;
 import br.com.marmitaria.dto.produto.RespostaProdutoDTO;
 import br.com.marmitaria.entity.produto.Produto;
@@ -10,6 +11,6 @@ import java.util.List;
 public interface ProdutoService {
     Produto cadastrarProduto(CadastroProdutoDTO dto);
     List<RespostaProdutoDTO> listarTodos();
-    RespostaProdutoDTO atualizarProduto(Long id, CadastroProdutoDTO dto);
+    RespostaProdutoDTO atualizarProduto(Long id, AtualizarProdutoDTO dto);
     void removerProduto(Long id);
 }

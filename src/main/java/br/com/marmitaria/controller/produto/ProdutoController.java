@@ -2,6 +2,7 @@ package br.com.marmitaria.controller.produto;
 
 import java.util.List;
 
+import br.com.marmitaria.dto.produto.AtualizarProdutoDTO;
 import br.com.marmitaria.dto.produto.CadastroProdutoDTO;
 import br.com.marmitaria.dto.produto.RespostaProdutoDTO;
 import br.com.marmitaria.service.produto.ProdutoService;
@@ -34,7 +35,7 @@ public class ProdutoController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<RespostaProdutoDTO> atualizarProduto(@PathVariable Long id, @Valid @RequestBody CadastroProdutoDTO dto) {
+    public ResponseEntity<RespostaProdutoDTO> atualizarProduto(@PathVariable Long id, @Valid @RequestBody AtualizarProdutoDTO dto) {
         RespostaProdutoDTO produto = produtoService.atualizarProduto(id, dto);
         return ResponseEntity.status(HttpStatus.OK).body(produto);
     }
