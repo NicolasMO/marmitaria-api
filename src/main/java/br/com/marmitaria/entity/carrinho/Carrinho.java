@@ -24,4 +24,9 @@ public class Carrinho {
     @OneToMany(mappedBy = "carrinho", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CarrinhoItem> itens;
 
+    public Carrinho (Usuario usuario, List<CarrinhoItem> itens) {
+        this.usuario = usuario;
+        this.itens = itens;
+    }
+
 }

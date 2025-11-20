@@ -1,7 +1,9 @@
 package br.com.marmitaria.enums;
 
 public enum QuantidadeIngredientes {
-	MARMITA_PEQUENA(1, 1, 2, 2),
+	MARMITA_PEQUENA(
+            1, 1,
+            2, 2),
 	MARMITA_GRANDE(2, 2, 3, 4);
 	
 	private final int produtoId;

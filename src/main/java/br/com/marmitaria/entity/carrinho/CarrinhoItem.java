@@ -44,4 +44,12 @@ public class CarrinhoItem {
     )
 
     private Set<Ingrediente> ingredientes;
+
+    public CarrinhoItem(Carrinho carrinho, Produto produto, Integer quantidade, String observacao, Set<Ingrediente> ingredientes) {
+        this.carrinho = carrinho;
+        this.produto = produto;
+        this.quantidade = quantidade;
+        this.observacao = observacao;
+        this.ingredientes = ingredientes;
+    }
 }
