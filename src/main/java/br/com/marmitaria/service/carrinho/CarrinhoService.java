@@ -7,4 +7,5 @@ import jakarta.validation.Valid;
 public interface CarrinhoService {
     RespostaCarrinhoDTO listarCarrinho(Long usuarioId);
     RespostaCarrinhoDTO adicionarItem(Long usuarioId,AdicionarCarrinhoItemDTO dto);
+    void removerItem(Long usuarioId, Long itemId);
 }

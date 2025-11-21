@@ -29,4 +29,10 @@ public class CarrinhoController {
         RespostaCarrinhoDTO carrinho = carrinhoService.adicionarItem(usuarioId, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(carrinho);
     }
+
+    @DeleteMapping("/{usuarioId}/item/{itemId}")
+    public ResponseEntity<String> removerItem(@PathVariable Long usuarioId, @PathVariable Long itemId) {
+        carrinhoService.removerItem(usuarioId, itemId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Item removido do carrinho com sucesso.");
+    }
 }

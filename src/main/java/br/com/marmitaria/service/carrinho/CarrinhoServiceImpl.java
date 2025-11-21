@@ -14,6 +14,9 @@ import br.com.marmitaria.repository.carrinho.CarrinhoRepository;
 import br.com.marmitaria.repository.ingrediente.IngredienteRepository;
 import br.com.marmitaria.repository.produto.ProdutoRepository;
 import br.com.marmitaria.repository.usuario.UsuarioRepository;
+import br.com.marmitaria.service.carrinho.strategy.RegraBebida;
+import br.com.marmitaria.service.carrinho.strategy.RegraMarmita;
+import br.com.marmitaria.service.carrinho.strategy.RegraProduto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,15 +61,18 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 
         List<Long> ingredientesId = dto.ingredientesId() != null ? dto.ingredientesId() : List.of();
 
-        validarRegrasMarmita(produto, ingredientesId);
-        Set<Ingrediente> ingredientes = new HashSet<>(ingredienteRepository.findAllById(ingredientesId));
+        RegraProduto regra = obterRegra(produto);
+
+        List<Ingrediente> ingredientes = ingredienteRepository.findAllById(ingredientesId);
+
+        regra.validar(produto, ingredientes);
 
         CarrinhoItem item = new CarrinhoItem(
                 carrinho,
                 produto,
                 dto.quantidade(),
                 dto.observacao(),
-                ingredientes
+                new HashSet<>(ingredientes)
         );
 
         carrinho.getItens().add(item);
@@ -74,6 +80,23 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 
         return mapCarrinhoToDTO(carrinho);
     }
+
+
+    @Override
+    @Transactional
+    public void removerItem(Long usuarioId, Long itemId) {
+        Carrinho carrinho = carrinhoRepository.findByUsuarioId(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Carrinho do usuário não encontrado."));
+
+        CarrinhoItem item = carrinho.getItens().stream().filter(i -> i.getId().equals(itemId))
+                .findFirst().orElseThrow(() -> new RuntimeException("Item não encontrado no carrinho."));
+
+        carrinho.getItens().remove(item);
+
+        carrinhoRepository.save(carrinho);
+    }
+
+    // Metodos Privados
 
     private Carrinho criarCarrinho(Long usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
@@ -84,35 +107,12 @@ public class CarrinhoServiceImpl implements CarrinhoService {
         return carrinhoRepository.save(carrinho);
     }
 
-    private void validarRegrasMarmita(Produto produto, List<Long> ingredientesId) {
-        if (produto.getTipo() == TipoProduto.BEBIDA) {
-            if (ingredientesId != null && !ingredientesId.isEmpty()) {
-                throw new RuntimeException("Bebidas não podem ter ingredientes.");
-            }
-            return;
-        }
-
-        if (ingredientesId == null || ingredientesId.isEmpty()) {
-            throw new RuntimeException("Marmitas devem conter ingredientes");
-        }
-
-        List<Ingrediente> ingredientes = ingredienteRepository.findAllById(ingredientesId);
-
-        long proteina = ingredientes.stream().filter(i -> i.getCategoria() == CategoriaIngrediente.PROTEINA).count();
-        long carboidrato = ingredientes.stream().filter(i -> i.getCategoria() == CategoriaIngrediente.CARBOIDRATO).count();
-        long complemento = ingredientes.stream().filter(i -> i.getCategoria() == CategoriaIngrediente.COMPLEMENTO).count();
-
-        if (produto.getTipo() == TipoProduto.MARMITA_PEQUENA) {
-            if (proteina != 1) throw new RuntimeException("Marmita pequena requer exatamente 1 proteína.");
-            if (carboidrato < 1 || carboidrato > 2) throw new RuntimeException("Marmita pequena deve ter entre 1 e 2 carboidratos.");
-            if (complemento > 2) throw new RuntimeException("Marmita pequena deve ter entre nenhum ou 2 complementos.");
-        }
-
-        if (produto.getTipo() == TipoProduto.MARMITA_GRANDE) {
-            if (proteina < 1 || proteina > 2) throw new RuntimeException("Marmita grande deve ter entre 1 e 2 proteínas.");
-            if (carboidrato < 1 || carboidrato > 3) throw new RuntimeException("Marmita grande deve ter entre 1 e 3 carboidratos.");
-            if (complemento > 4) throw new RuntimeException("Marmita grande deve ter entre nenhum ou 4 complementos.");
-        }
+    private RegraProduto obterRegra(Produto produto) {
+        return switch (produto.getTipo()) {
+            case BEBIDA -> new RegraBebida();
+            case MARMITA_PEQUENA, MARMITA_GRANDE -> new RegraMarmita();
+            default -> throw new RuntimeException("Tipo de produto não suportado.");
+        };
     }
 
     private RespostaCarrinhoDTO mapCarrinhoToDTO(Carrinho carrinho) {
