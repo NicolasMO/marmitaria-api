@@ -1,6 +1,7 @@
 package br.com.marmitaria.controller.carrinho;
 
 import br.com.marmitaria.dto.carrinho.AdicionarCarrinhoItemDTO;
+import br.com.marmitaria.dto.carrinho.AlterarQuantidadeCarrinhoItemDTO;
 import br.com.marmitaria.dto.carrinho.RespostaCarrinhoDTO;
 import br.com.marmitaria.dto.carrinho.RespostaCarrinhoItemDTO;
 import br.com.marmitaria.entity.usuario.Response;
@@ -30,9 +31,25 @@ public class CarrinhoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(carrinho);
     }
 
+    @PutMapping("/{usuarioId}/item/{itemId}/quantidade")
+    public ResponseEntity<RespostaCarrinhoDTO> alterarQuantidade(
+            @PathVariable Long usuarioId,
+            @PathVariable Long itemId,
+            @Valid @RequestBody AlterarQuantidadeCarrinhoItemDTO dto)
+    {
+        RespostaCarrinhoDTO carrinho = carrinhoService.alterarQuantidade(usuarioId, itemId, dto);
+        return ResponseEntity.status(HttpStatus.OK).body(carrinho);
+    }
+
     @DeleteMapping("/{usuarioId}/item/{itemId}")
     public ResponseEntity<String> removerItem(@PathVariable Long usuarioId, @PathVariable Long itemId) {
         carrinhoService.removerItem(usuarioId, itemId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Item removido do carrinho com sucesso.");
+    }
+
+    @DeleteMapping("/{usuarioId}/limpar")
+    public ResponseEntity<Void> limparCarrinho(@PathVariable Long usuarioId) {
+        carrinhoService.limparCarrinho(usuarioId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

@@ -6,11 +6,9 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
-public record AdicionarCarrinhoItemDTO(
+public record AlterarQuantidadeCarrinhoItemDTO(
         @NotNull
-        Long produtoId,
-
-        List<Long> ingredientesId,
-
-        String observacao
+        @Min(1)
+        @Max(50)
+        Integer quantidade
 ) {}

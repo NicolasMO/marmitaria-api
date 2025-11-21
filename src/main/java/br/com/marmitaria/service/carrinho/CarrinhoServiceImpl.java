@@ -1,6 +1,7 @@
 package br.com.marmitaria.service.carrinho;
 
 import br.com.marmitaria.dto.carrinho.AdicionarCarrinhoItemDTO;
+import br.com.marmitaria.dto.carrinho.AlterarQuantidadeCarrinhoItemDTO;
 import br.com.marmitaria.dto.carrinho.RespostaCarrinhoDTO;
 import br.com.marmitaria.dto.carrinho.RespostaCarrinhoItemDTO;
 import br.com.marmitaria.entity.carrinho.Carrinho;
@@ -60,17 +61,25 @@ public class CarrinhoServiceImpl implements CarrinhoService {
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
 
         List<Long> ingredientesId = dto.ingredientesId() != null ? dto.ingredientesId() : List.of();
-
-        RegraProduto regra = obterRegra(produto);
-
         List<Ingrediente> ingredientes = ingredienteRepository.findAllById(ingredientesId);
 
+        RegraProduto regra = obterRegra(produto);
         regra.validar(produto, ingredientes);
+
+        if (produto.getTipo() == TipoProduto.BEBIDA) {
+            CarrinhoItem bebidaExistente = carrinho.getItens().stream().filter(item -> item.getProduto().getId().equals(produto.getId()))
+                    .findFirst().orElse(null);
+
+            if (bebidaExistente != null) {
+                bebidaExistente.setQuantidade(bebidaExistente.getQuantidade() + 1);
+                return mapCarrinhoToDTO(carrinhoRepository.save(carrinho));
+            }
+        }
 
         CarrinhoItem item = new CarrinhoItem(
                 carrinho,
                 produto,
-                dto.quantidade(),
+                1,
                 dto.observacao(),
                 new HashSet<>(ingredientes)
         );
@@ -81,17 +90,51 @@ public class CarrinhoServiceImpl implements CarrinhoService {
         return mapCarrinhoToDTO(carrinho);
     }
 
+    @Override
+    @Transactional
+    public RespostaCarrinhoDTO alterarQuantidade(Long usuarioId, Long itemId, AlterarQuantidadeCarrinhoItemDTO dto) {
+
+        if (dto.quantidade() == null || dto.quantidade() < 1) {
+            throw new RuntimeException(("Quantidade mínima permitida é 1."));
+        }
+
+        Carrinho carrinho = carrinhoRepository.findByUsuarioId(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Carrinho não encontrado."));
+
+        CarrinhoItem item = carrinho.getItens().stream().filter(i -> i.getId().equals(itemId))
+                .findFirst().orElseThrow(() -> new RuntimeException("Item não encontrado no carrinho."));
+
+        if (item.getProduto().getTipo().isMarmita()) {
+            throw new RuntimeException("Não é permitido alterar a quantidade de marmitas.");
+        }
+
+        item.setQuantidade(dto.quantidade());
+        carrinhoRepository.save(carrinho);
+
+        return mapCarrinhoToDTO(carrinho);
+    }
 
     @Override
     @Transactional
     public void removerItem(Long usuarioId, Long itemId) {
         Carrinho carrinho = carrinhoRepository.findByUsuarioId(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Carrinho do usuário não encontrado."));
+                .orElseThrow(() -> new RuntimeException("Carrinho não encontrado."));
 
         CarrinhoItem item = carrinho.getItens().stream().filter(i -> i.getId().equals(itemId))
                 .findFirst().orElseThrow(() -> new RuntimeException("Item não encontrado no carrinho."));
 
         carrinho.getItens().remove(item);
+
+        carrinhoRepository.save(carrinho);
+    }
+
+    @Override
+    @Transactional
+    public void limparCarrinho(Long usuarioId) {
+        Carrinho carrinho = carrinhoRepository.findByUsuarioId(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Carrinho não encotrado."));
+
+        carrinho.getItens().clear();
 
         carrinhoRepository.save(carrinho);
     }
