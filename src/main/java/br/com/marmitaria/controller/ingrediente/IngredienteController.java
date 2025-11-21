@@ -45,8 +45,8 @@ public class IngredienteController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> removerIngrediente(@PathVariable Long id) {
+    public ResponseEntity<Void> removerIngrediente(@PathVariable Long id) {
         ingredienteService.removerIngrediente(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Ingrediente removido com sucesso.");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

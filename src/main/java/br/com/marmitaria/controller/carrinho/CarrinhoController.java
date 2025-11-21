@@ -42,9 +42,9 @@ public class CarrinhoController {
     }
 
     @DeleteMapping("/{usuarioId}/item/{itemId}")
-    public ResponseEntity<String> removerItem(@PathVariable Long usuarioId, @PathVariable Long itemId) {
+    public ResponseEntity<Void> removerItem(@PathVariable Long usuarioId, @PathVariable Long itemId) {
         carrinhoService.removerItem(usuarioId, itemId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Item removido do carrinho com sucesso.");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @DeleteMapping("/{usuarioId}/limpar")

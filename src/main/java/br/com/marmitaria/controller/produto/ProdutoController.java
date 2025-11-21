@@ -41,8 +41,8 @@ public class ProdutoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> removerProduto(@PathVariable Long id) {
+    public ResponseEntity<Void> removerProduto(@PathVariable Long id) {
         produtoService.removerProduto(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Produto removido com sucesso.");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

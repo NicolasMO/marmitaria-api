@@ -33,8 +33,8 @@ public class EnderecoController {
 	}
 
     @DeleteMapping("/{usuarioId}/{id}")
-    public ResponseEntity<String> removerEndereco(@PathVariable long usuarioId, @PathVariable long id) {
+    public ResponseEntity<Void> removerEndereco(@PathVariable long usuarioId, @PathVariable long id) {
         enderecoService.removerEnderecoDoUsuario(usuarioId, id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Endereço removido com sucesso");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
