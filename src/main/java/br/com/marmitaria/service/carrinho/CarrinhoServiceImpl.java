@@ -63,6 +63,10 @@ public class CarrinhoServiceImpl implements CarrinhoService {
         List<Long> ingredientesId = dto.ingredientesId() != null ? dto.ingredientesId() : List.of();
         List<Ingrediente> ingredientes = ingredienteRepository.findAllById(ingredientesId);
 
+        if (ingredientes.size() != ingredientesId.size()) {
+            throw new RuntimeException("Um ou mais ingredientes informados não existem ou estão repetidos.");
+        }
+
         RegraProduto regra = obterRegra(produto);
         regra.validar(produto, ingredientes);
 
