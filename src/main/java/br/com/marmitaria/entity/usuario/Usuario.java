@@ -7,6 +7,8 @@ import java.util.List;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.hibernate.validator.constraints.br.CPF;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -45,6 +47,7 @@ public class Usuario implements UserDetails {
 	private String celular;
 
     @NotBlank
+    @Getter(AccessLevel.NONE)
 	@Column(nullable = false)
 	private String senha;
 	

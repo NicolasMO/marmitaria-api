@@ -1,58 +1,52 @@
 package br.com.marmitaria.config.security;
 
-import org.hibernate.Hibernate;
+import br.com.marmitaria.repository.usuario.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import br.com.marmitaria.entity.usuario.Usuario;
-import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.IOException;
+import java.util.List;
+
 @Component
 public class JwtFilter extends OncePerRequestFilter {
-	
-	private final JwtUtil jwtUtil;
-	private final UserDetailsService userDetailsService;
 
+    @Autowired
+    JwtUtil jwtUtil;
 
-	public JwtFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
-		this.jwtUtil = jwtUtil;
-		this.userDetailsService = userDetailsService;
-	}
-	
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-			throws IOException, ServletException, java.io.IOException {
+    @Autowired
+    UsuarioRepository usuarioRepository;
 
-		String header = request.getHeader("Authorization");
-		if (header != null && header.startsWith("Bearer ")) {
-			 try {
-				String token = header.substring(7);
-	            UsernamePasswordAuthenticationToken auth = getAuthentication(token);
-	            if (auth != null) {
-	                SecurityContextHolder.getContext().setAuthentication(auth);
-	            	}
-		        } catch (Exception e) {
-		            System.out.println("Erro ao processar o token: " + e.getMessage());
-	        	}
-		}
-		chain.doFilter(request, response);
-	}
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String authHeader = request.getHeader("Authorization");
 
-	private UsernamePasswordAuthenticationToken getAuthentication(String token) {
-		if (jwtUtil.tokenValido(token)) {
-			String username = jwtUtil.getClaim(token, "email");
-			UserDetails user = userDetailsService.loadUserByUsername(username);
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            try {
+                String email = jwtUtil.extrairEmail(token);
 
-			return new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-		}
-		return null;
-	}
+                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    Usuario usuario = usuarioRepository.findByEmail(email).orElse(null);
+
+                    if (usuario != null && jwtUtil.isTokenValido(token, usuario)) {
+                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(usuario, null, List.of());
+
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("TOKEN INVÁLIDO: " + e.getMessage());
+            }
+        }
+        filterChain.doFilter(request, response);
+    }
 }
