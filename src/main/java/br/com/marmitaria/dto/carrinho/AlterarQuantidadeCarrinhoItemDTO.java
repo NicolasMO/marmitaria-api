@@ -4,11 +4,9 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.List;
-
 public record AlterarQuantidadeCarrinhoItemDTO(
         @NotNull
-        @Min(1)
-        @Max(50)
+        @Min(value = 1, message = "Quantidade mínima permitida: 1")
+        @Max(value = 50, message = "Quantidade maxima permitida: 50")
         Integer quantidade
 ) {}

@@ -14,27 +14,27 @@ import br.com.marmitaria.service.endereco.EnderecoService;
 import java.util.List;
 
 @RestController
-@RequestMapping("endereco")
+@RequestMapping("enderecos")
 public class EnderecoController {
 	
 	@Autowired
     EnderecoService enderecoService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<List<RespostaEnderecoDTO>> listarEnderecosDoUsuario(@PathVariable long id) {
-        List<RespostaEnderecoDTO> endereco = enderecoService.listarEnderecosDoUsuario(id);
+    @GetMapping("/buscar")
+    public ResponseEntity<List<RespostaEnderecoDTO>> listarEnderecosDoUsuario() {
+        List<RespostaEnderecoDTO> endereco = enderecoService.listarEnderecosDoUsuario();
         return ResponseEntity.status(HttpStatus.OK).body(endereco);
     }
 
-	@PostMapping("/{id}")
-	public ResponseEntity<Endereco> cadastrarEndereco(@PathVariable long id, @Valid @RequestBody CadastroEnderecoDTO dto) {
-		Endereco endereco = enderecoService.cadastrarEndereco(id, dto);
+	@PostMapping
+	public ResponseEntity<Endereco> cadastrarEndereco(@Valid @RequestBody CadastroEnderecoDTO dto) {
+		Endereco endereco = enderecoService.cadastrarEndereco(dto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(endereco);
 	}
 
-    @DeleteMapping("/{usuarioId}/{id}")
-    public ResponseEntity<Void> removerEndereco(@PathVariable long usuarioId, @PathVariable long id) {
-        enderecoService.removerEnderecoDoUsuario(usuarioId, id);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> removerEndereco(@PathVariable Long id) {
+        enderecoService.removerEnderecoDoUsuario(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

@@ -8,7 +8,7 @@ import br.com.marmitaria.entity.usuario.Usuario;
 
 public interface UsuarioService {
 	List<Usuario> listarTodos();
-	Optional<Usuario> buscarUsuario(Long id);
+	Optional<Usuario> buscarUsuario();
 	Usuario cadastrarUsuario(CadastroUsuarioDTO cadastroUsuarioDTO);
     void removerUsuario(long id);
 }

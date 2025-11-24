@@ -10,7 +10,6 @@ import br.com.marmitaria.entity.carrinho.CarrinhoItem;
 import br.com.marmitaria.entity.ingrediente.Ingrediente;
 import br.com.marmitaria.entity.produto.Produto;
 import br.com.marmitaria.entity.usuario.Usuario;
-import br.com.marmitaria.enums.CategoriaIngrediente;
 import br.com.marmitaria.enums.TipoProduto;
 import br.com.marmitaria.repository.carrinho.CarrinhoRepository;
 import br.com.marmitaria.repository.ingrediente.IngredienteRepository;
@@ -26,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service

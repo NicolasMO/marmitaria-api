@@ -1,5 +1,6 @@
 package br.com.marmitaria.service.endereco;
 
+import br.com.marmitaria.config.security.AuthenticatedUser;
 import br.com.marmitaria.dto.endereco.RespostaEnderecoDTO;
 import br.com.marmitaria.external.viacep.dto.ViaCepResponse;
 import br.com.marmitaria.external.viacep.service.ViaCepService;
@@ -19,18 +20,23 @@ import java.util.List;
 public class EnderecoServiceImpl implements EnderecoService {
 
     @Autowired
-	private EnderecoRepository enderecoRepository;
+    AuthenticatedUser authenticatedUser;
 
     @Autowired
-	private UsuarioRepository usuarioRepository;
+	EnderecoRepository enderecoRepository;
 
     @Autowired
-    private ViaCepService viaCepService;
+	UsuarioRepository usuarioRepository;
+
+    @Autowired
+    ViaCepService viaCepService;
 
 	
 	@Override
 	@Transactional
-	public Endereco cadastrarEndereco(Long usuarioId, CadastroEnderecoDTO dto) {
+	public Endereco cadastrarEndereco(CadastroEnderecoDTO dto) {
+
+        Long usuarioId = authenticatedUser.getId();
 		Usuario usuario = usuarioRepository.findById(usuarioId)
 				.orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 
@@ -59,26 +65,30 @@ public class EnderecoServiceImpl implements EnderecoService {
 	}
 
     @Override
-    public List<RespostaEnderecoDTO> listarEnderecosDoUsuario(Long usuarioId) {
-      Usuario usuario = usuarioRepository.findById(usuarioId)
-              .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+    public List<RespostaEnderecoDTO> listarEnderecosDoUsuario() {
 
-      return usuario.getEnderecos().stream()
-              .map(e -> new RespostaEnderecoDTO(
-                      e.getId(),
-                      e.getLogradouro(),
-                      e.getNumero(),
-                      e.getBairro(),
-                      e.getCidade(),
-                      e.getEstado(),
-                      e.getComplemento(),
-                      e.getCep()
-              )).toList();
+        Long usuarioId = authenticatedUser.getId();
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+
+        return usuario.getEnderecos().stream()
+                .map(e -> new RespostaEnderecoDTO(
+                        e.getId(),
+                        e.getLogradouro(),
+                        e.getNumero(),
+                        e.getBairro(),
+                        e.getCidade(),
+                        e.getEstado(),
+                        e.getComplemento(),
+                        e.getCep()
+                )).toList();
     };
 
     @Override
     @Transactional
-    public void removerEnderecoDoUsuario(long usuarioId, long id) {
+    public void removerEnderecoDoUsuario(Long id) {
+
+        Long usuarioId = authenticatedUser.getId();
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 

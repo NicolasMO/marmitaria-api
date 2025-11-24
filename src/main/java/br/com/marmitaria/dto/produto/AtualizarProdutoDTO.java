@@ -11,8 +11,8 @@ public record AtualizarProdutoDTO(
 
         @NotNull
         @Digits(integer = 4, fraction = 2)
-        @DecimalMin("0.00")
-        @DecimalMax("9999.99")
+        @DecimalMin(value = "0.00", message = "O preço unitário deve ser 0.00 ou maior.")
+        @DecimalMax(value = "9999.99", message = "O preço unitário não pode ser maior que 9999.99.")
         BigDecimal preco_unitario,
 
         @NotNull

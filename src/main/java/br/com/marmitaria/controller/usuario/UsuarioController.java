@@ -25,11 +25,11 @@ public class UsuarioController {
 		List<Usuario> usuarios = usuarioService.listarTodos();
 		return ResponseEntity.ok(usuarios);
 	}
-	
-	@GetMapping(value = "{id}")
-	public ResponseEntity<Optional<Usuario>> buscarUsuario(@PathVariable Long id) {
-		Optional<Usuario> usuario = usuarioService.buscarUsuario(id);
-		return ResponseEntity.ok(usuario);
+
+    @GetMapping("/info")
+    public ResponseEntity<Optional<Usuario>> buscarUsuario() {
+		Optional<Usuario> usuario = usuarioService.buscarUsuario();
+		return ResponseEntity.status(HttpStatus.OK).body(usuario);
 	}
 	
 	@PostMapping

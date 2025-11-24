@@ -3,8 +3,6 @@ package br.com.marmitaria.controller.carrinho;
 import br.com.marmitaria.dto.carrinho.AdicionarCarrinhoItemDTO;
 import br.com.marmitaria.dto.carrinho.AlterarQuantidadeCarrinhoItemDTO;
 import br.com.marmitaria.dto.carrinho.RespostaCarrinhoDTO;
-import br.com.marmitaria.dto.carrinho.RespostaCarrinhoItemDTO;
-import br.com.marmitaria.entity.usuario.Response;
 import br.com.marmitaria.service.carrinho.CarrinhoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

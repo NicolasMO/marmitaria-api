@@ -3,7 +3,6 @@ package br.com.marmitaria.service.carrinho;
 import br.com.marmitaria.dto.carrinho.AdicionarCarrinhoItemDTO;
 import br.com.marmitaria.dto.carrinho.AlterarQuantidadeCarrinhoItemDTO;
 import br.com.marmitaria.dto.carrinho.RespostaCarrinhoDTO;
-import jakarta.validation.Valid;
 
 public interface CarrinhoService {
     RespostaCarrinhoDTO listarCarrinho();

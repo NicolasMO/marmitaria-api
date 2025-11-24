@@ -3,12 +3,12 @@ package br.com.marmitaria.service.usuario;
 import java.util.List;
 import java.util.Optional;
 
+import br.com.marmitaria.config.security.AuthenticatedUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.marmitaria.config.security.JwtUtil;
 import br.com.marmitaria.dto.usuario.CadastroUsuarioDTO;
 import br.com.marmitaria.entity.usuario.Usuario;
 import br.com.marmitaria.repository.usuario.UsuarioRepository;
@@ -17,22 +17,13 @@ import br.com.marmitaria.repository.usuario.UsuarioRepository;
 public class UsuarioServiceImpl implements UsuarioService {
 
     @Autowired
-	private UsuarioRepository usuarioRepository;
+	UsuarioRepository usuarioRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    PasswordEncoder passwordEncoder;
 
-    // Codigo antigo
-
-    private final JwtUtil jwtUtil;
-
-
-
-    public UsuarioServiceImpl(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
-    }
-
-    // Codigo antigo
+    @Autowired
+    AuthenticatedUser authenticatedUser;
 
 	@Override
 	public List<Usuario> listarTodos() {
@@ -40,8 +31,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 	
 	@Override
-	public Optional<Usuario> buscarUsuario(Long id) {
-		return usuarioRepository.findById(id);
+	public Optional<Usuario> buscarUsuario() {
+        Long usuarioId = authenticatedUser.getId();
+        return usuarioRepository.findById(usuarioId);
 	}
 
 	@Override

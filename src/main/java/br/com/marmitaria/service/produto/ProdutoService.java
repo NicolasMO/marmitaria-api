@@ -4,7 +4,6 @@ import br.com.marmitaria.dto.produto.AtualizarProdutoDTO;
 import br.com.marmitaria.dto.produto.CadastroProdutoDTO;
 import br.com.marmitaria.dto.produto.RespostaProdutoDTO;
 import br.com.marmitaria.entity.produto.Produto;
-import jakarta.validation.Valid;
 
 import java.util.List;
 

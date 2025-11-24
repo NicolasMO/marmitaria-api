@@ -4,7 +4,6 @@ import br.com.marmitaria.entity.ingrediente.Ingrediente;
 import br.com.marmitaria.entity.produto.Produto;
 import br.com.marmitaria.enums.CategoriaIngrediente;
 import br.com.marmitaria.enums.RegrasMarmita;
-import br.com.marmitaria.enums.TipoProduto;
 
 import java.util.List;
 

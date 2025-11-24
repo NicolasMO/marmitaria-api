@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import br.com.marmitaria.entity.produto.Produto;
-import br.com.marmitaria.repository.produto.ProdutoRepository;
 
 @RestController
 @RequestMapping("produtos")
@@ -34,7 +33,7 @@ public class ProdutoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(produto);
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/atualizar/{id}")
     public ResponseEntity<RespostaProdutoDTO> atualizarProduto(@PathVariable Long id, @Valid @RequestBody AtualizarProdutoDTO dto) {
         RespostaProdutoDTO produto = produtoService.atualizarProduto(id, dto);
         return ResponseEntity.status(HttpStatus.OK).body(produto);

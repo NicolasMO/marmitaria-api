@@ -7,7 +7,7 @@ import br.com.marmitaria.entity.endereco.Endereco;
 import java.util.List;
 
 public interface EnderecoService {
-	Endereco cadastrarEndereco(Long usuarioId, CadastroEnderecoDTO dto);
-    List<RespostaEnderecoDTO> listarEnderecosDoUsuario(Long usuarioId);
-    void removerEnderecoDoUsuario(long usuarioId, long id);
+	Endereco cadastrarEndereco(CadastroEnderecoDTO dto);
+    List<RespostaEnderecoDTO> listarEnderecosDoUsuario();
+    void removerEnderecoDoUsuario(Long id);
 }

@@ -1,14 +1,10 @@
 package br.com.marmitaria.service.auth;
 
-import java.util.Optional;
-
 import br.com.marmitaria.dto.auth.LoginDTO;
 import br.com.marmitaria.dto.auth.TokenDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import br.com.marmitaria.config.security.JwtUtil;
 import br.com.marmitaria.entity.usuario.Usuario;
