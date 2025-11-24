@@ -26,15 +26,15 @@ public class Produto {
 	private Long id;
 
     @NotBlank
-	@Column(nullable = false, length = 50)
+	@Column(nullable = false, length = 255)
 	private String nome;
 
     @NotNull
     @Digits(integer = 4, fraction = 2)
     @DecimalMin("0.00")
     @DecimalMax("9999.99")
-	@Column(nullable = false, precision = 6, scale = 2)
-	private BigDecimal preco_unitario;
+	@Column(name = "preco_unitario", nullable = false, precision = 6, scale = 2)
+	private BigDecimal precoUnitario;
 
     @NotBlank
 	@Column(nullable = false)
@@ -44,16 +44,15 @@ public class Produto {
 	@Column(nullable = false, length = 20)
 	private TipoProduto tipo;
 
-    public Produto (String nome, BigDecimal preco_unitario, String imagem, TipoProduto tipo) {
+    public Produto (String nome, BigDecimal precoUnitario, TipoProduto tipo) {
         this.nome = nome;
-        this.preco_unitario = preco_unitario;
-        this.imagem = imagem;
+        this.precoUnitario = precoUnitario;
         this.tipo = tipo;
     }
 
-    public void atualizarDados(String nome, BigDecimal preco_unitario, TipoProduto tipo) {
+    public void atualizarDados(String nome, BigDecimal precoUnitario, TipoProduto tipo) {
         this.nome = nome;
-        this.preco_unitario = preco_unitario;
+        this.precoUnitario = precoUnitario;
         this.tipo = tipo;
     }
 }

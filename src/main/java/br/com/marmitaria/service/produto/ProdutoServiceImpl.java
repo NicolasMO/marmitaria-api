@@ -26,8 +26,7 @@ public class ProdutoServiceImpl implements ProdutoService {
 
         Produto produto = new Produto(
                 dto.nome(),
-                dto.preco_unitario(),
-                dto.imagem(),
+                dto.precoUnitario(),
                 dto.tipo()
         );
 
@@ -41,7 +40,7 @@ public class ProdutoServiceImpl implements ProdutoService {
         return produtos.stream().map(prod -> new RespostaProdutoDTO(
                 prod.getId(),
                 prod.getNome(),
-                prod.getPreco_unitario(),
+                prod.getPrecoUnitario(),
                 prod.getImagem(),
                 prod.getTipo()
         )).toList();
@@ -57,13 +56,13 @@ public class ProdutoServiceImpl implements ProdutoService {
         Produto produto = produtoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
 
-        produto.atualizarDados(dto.nome(), dto.preco_unitario(), dto.tipo());
+        produto.atualizarDados(dto.nome(), dto.precoUnitario(), dto.tipo());
         produtoRepository.save(produto);
 
         return new RespostaProdutoDTO(
                 produto.getId(),
                 produto.getNome(),
-                produto.getPreco_unitario(),
+                produto.getPrecoUnitario(),
                 produto.getImagem(),
                 produto.getTipo()
         );

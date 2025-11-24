@@ -1,0 +1,30 @@
+INSERT INTO produto (nome, preco_unitario, tipo) VALUES
+('Marmita Pequena', 12.0, 'MARMITA_PEQUENA'),
+('Marmita Grande', 16.0, 'MARMITA_GRANDE'),
+('Coca-Cola Lata', 5.0, 'BEBIDA'),
+('Coca Zero Lata', 6.0, 'BEBIDA'),
+('Fanta Laranja Lata', 5.0, 'BEBIDA'),
+('Guaraná Lata', 5.0, 'BEBIDA'),
+('Água Mineral', 3.0, 'BEBIDA');
+
+INSERT INTO ingrediente (categoria, nome) VALUES
+('PROTEINA', 'Peito de frango assado'),
+('PROTEINA', 'Carne trinchada'),
+('PROTEINA', 'Omelete c/ frango e queijo'),
+('PROTEINA', 'Almondegas'),
+('PROTEINA', 'Bife de Soja'),
+('CARBOIDRATO', 'Arroz branco'),
+('CARBOIDRATO', 'Baião'),
+('CARBOIDRATO', 'Feijão Carioca'),
+('CARBOIDRATO', 'Macarrão ao alho e óleo'),
+('CARBOIDRATO', 'Arroz integral'),
+('COMPLEMENTO', 'Batata cozida'),
+('COMPLEMENTO', 'Vinagrete'),
+('COMPLEMENTO', 'Repolho refogado'),
+('COMPLEMENTO', 'Batata doce cozida'),
+('COMPLEMENTO', 'Suflê de xuxu'),
+('COMPLEMENTO', 'Salada verde'),
+('COMPLEMENTO', 'Cenoura ralada'),
+('COMPLEMENTO', 'Legumes com maionese'),
+('COMPLEMENTO', 'Farofa de ovo'),
+('COMPLEMENTO', 'Abóbora cozida');

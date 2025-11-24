@@ -14,7 +14,7 @@ import br.com.marmitaria.entity.usuario.Usuario;
 import br.com.marmitaria.service.usuario.UsuarioService;
 
 @RestController
-@RequestMapping("usuario")
+@RequestMapping("usuarios")
 public class UsuarioController {
 
     @Autowired

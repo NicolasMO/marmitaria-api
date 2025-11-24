@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 public record RespostaProdutoDTO(
         Long id,
         String nome,
-        BigDecimal preco_unitario,
+        BigDecimal precoUnitario,
         String imagem,
         TipoProduto tipo
 ) {}

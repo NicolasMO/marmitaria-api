@@ -180,7 +180,7 @@ public class CarrinhoServiceImpl implements CarrinhoService {
                 .map(item -> new RespostaCarrinhoItemDTO(
                         item.getId(),
                         item.getProduto().getNome(),
-                        item.getProduto().getPreco_unitario(),
+                        item.getProduto().getPrecoUnitario(),
                         item.getQuantidade(),
                         item.getObservacao(),
                         item.getIngredientes().stream()

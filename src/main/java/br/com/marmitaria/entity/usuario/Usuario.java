@@ -38,19 +38,19 @@ public class Usuario implements UserDetails {
 	@Column(nullable = false, unique = true, length = 255)
 	private String email;
 
+    @NotBlank
+    @Getter(AccessLevel.NONE)
+    @Column(nullable = false, length = 100)
+    private String senha;
+
+    @NotBlank
+    @Column(nullable = false, length = 20)
+    private String celular;
+
     @CPF
     @Column(nullable = false, unique = true, length = 11)
 	private String cpf;
 
-    @NotBlank
-	@Column(nullable = false, length = 11)
-	private String celular;
-
-    @NotBlank
-    @Getter(AccessLevel.NONE)
-	@Column(nullable = false)
-	private String senha;
-	
 	@OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Endereco> enderecos;
 	

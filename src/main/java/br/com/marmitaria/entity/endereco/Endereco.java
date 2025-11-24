@@ -35,11 +35,11 @@ public class Endereco {
 
     @NotBlank
 	@Column(nullable = false, length = 150)
-	private String bairro;
+	private String cidade;
 
     @NotBlank
 	@Column(nullable = false, length = 150)
-	private String cidade;
+	private String bairro;
 
     @NotBlank
 	@Column(nullable = false, length = 100)
