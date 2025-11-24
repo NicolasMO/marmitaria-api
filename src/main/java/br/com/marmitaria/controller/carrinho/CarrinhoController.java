@@ -19,37 +19,36 @@ public class CarrinhoController {
     @Autowired
     CarrinhoService carrinhoService;
 
-    @GetMapping("/{usuarioId}")
-    public ResponseEntity<RespostaCarrinhoDTO> listarCarrinho(@PathVariable Long usuarioId) {
-        RespostaCarrinhoDTO carrinho = carrinhoService.listarCarrinho(usuarioId);
+    @GetMapping
+    public ResponseEntity<RespostaCarrinhoDTO> listarCarrinho() {
+        RespostaCarrinhoDTO carrinho = carrinhoService.listarCarrinho();
         return ResponseEntity.status(HttpStatus.OK).body(carrinho);
     }
 
-    @PostMapping("/{usuarioId}/item")
-    public ResponseEntity<RespostaCarrinhoDTO> adicionarItem(@PathVariable Long usuarioId, @Valid @RequestBody AdicionarCarrinhoItemDTO dto) {
-        RespostaCarrinhoDTO carrinho = carrinhoService.adicionarItem(usuarioId, dto);
+    @PostMapping("/item")
+    public ResponseEntity<RespostaCarrinhoDTO> adicionarItem(@Valid @RequestBody AdicionarCarrinhoItemDTO dto) {
+        RespostaCarrinhoDTO carrinho = carrinhoService.adicionarItem(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(carrinho);
     }
 
-    @PutMapping("/{usuarioId}/item/{itemId}/quantidade")
+    @PutMapping("/item/{itemId}/quantidade")
     public ResponseEntity<RespostaCarrinhoDTO> alterarQuantidade(
-            @PathVariable Long usuarioId,
             @PathVariable Long itemId,
             @Valid @RequestBody AlterarQuantidadeCarrinhoItemDTO dto)
     {
-        RespostaCarrinhoDTO carrinho = carrinhoService.alterarQuantidade(usuarioId, itemId, dto);
+        RespostaCarrinhoDTO carrinho = carrinhoService.alterarQuantidade(itemId, dto);
         return ResponseEntity.status(HttpStatus.OK).body(carrinho);
     }
 
-    @DeleteMapping("/{usuarioId}/item/{itemId}")
-    public ResponseEntity<Void> removerItem(@PathVariable Long usuarioId, @PathVariable Long itemId) {
-        carrinhoService.removerItem(usuarioId, itemId);
+    @DeleteMapping("/item/{itemId}")
+    public ResponseEntity<Void> removerItem(@PathVariable Long itemId) {
+        carrinhoService.removerItem(itemId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @DeleteMapping("/{usuarioId}/limpar")
-    public ResponseEntity<Void> limparCarrinho(@PathVariable Long usuarioId) {
-        carrinhoService.limparCarrinho(usuarioId);
+    @DeleteMapping("/limpar")
+    public ResponseEntity<Void> limparCarrinho() {
+        carrinhoService.limparCarrinho();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

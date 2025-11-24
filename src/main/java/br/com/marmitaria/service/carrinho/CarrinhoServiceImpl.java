@@ -1,5 +1,6 @@
 package br.com.marmitaria.service.carrinho;
 
+import br.com.marmitaria.config.security.AuthenticatedUser;
 import br.com.marmitaria.dto.carrinho.AdicionarCarrinhoItemDTO;
 import br.com.marmitaria.dto.carrinho.AlterarQuantidadeCarrinhoItemDTO;
 import br.com.marmitaria.dto.carrinho.RespostaCarrinhoDTO;
@@ -32,6 +33,9 @@ import java.util.stream.Collectors;
 public class CarrinhoServiceImpl implements CarrinhoService {
 
     @Autowired
+    private AuthenticatedUser authenticatedUser;
+
+    @Autowired
     CarrinhoRepository carrinhoRepository;
 
     @Autowired
@@ -44,7 +48,9 @@ public class CarrinhoServiceImpl implements CarrinhoService {
     IngredienteRepository ingredienteRepository;
 
     @Override
-    public RespostaCarrinhoDTO listarCarrinho(Long usuarioId) {
+    public RespostaCarrinhoDTO listarCarrinho() {
+        Long usuarioId = authenticatedUser.getId();
+
         Carrinho carrinho = carrinhoRepository.findByUsuarioId(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Carrinho não encontrado."));
 
@@ -53,7 +59,9 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 
     @Override
     @Transactional
-    public RespostaCarrinhoDTO adicionarItem(Long usuarioId, AdicionarCarrinhoItemDTO dto) {
+    public RespostaCarrinhoDTO adicionarItem(AdicionarCarrinhoItemDTO dto) {
+        Long usuarioId = authenticatedUser.getId();
+
         Carrinho carrinho = carrinhoRepository.findByUsuarioId(usuarioId)
                 .orElseGet(() -> criarCarrinho(usuarioId));
 
@@ -96,11 +104,13 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 
     @Override
     @Transactional
-    public RespostaCarrinhoDTO alterarQuantidade(Long usuarioId, Long itemId, AlterarQuantidadeCarrinhoItemDTO dto) {
+    public RespostaCarrinhoDTO alterarQuantidade(Long itemId, AlterarQuantidadeCarrinhoItemDTO dto) {
 
         if (dto.quantidade() == null || dto.quantidade() < 1) {
             throw new RuntimeException(("Quantidade mínima permitida é 1."));
         }
+
+        Long usuarioId = authenticatedUser.getId();
 
         Carrinho carrinho = carrinhoRepository.findByUsuarioId(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Carrinho não encontrado."));
@@ -120,7 +130,9 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 
     @Override
     @Transactional
-    public void removerItem(Long usuarioId, Long itemId) {
+    public void removerItem(Long itemId) {
+        Long usuarioId = authenticatedUser.getId();
+
         Carrinho carrinho = carrinhoRepository.findByUsuarioId(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Carrinho não encontrado."));
 
@@ -134,7 +146,9 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 
     @Override
     @Transactional
-    public void limparCarrinho(Long usuarioId) {
+    public void limparCarrinho() {
+        Long usuarioId = authenticatedUser.getId();
+
         Carrinho carrinho = carrinhoRepository.findByUsuarioId(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Carrinho não encotrado."));
 
