@@ -3,6 +3,8 @@ package br.com.marmitaria.service.ingrediente;
 import java.util.List;
 
 import br.com.marmitaria.dto.ingrediente.RespostaIngredienteDTO;
+import br.com.marmitaria.exception.ingrediente.IngredienteJaExistenteException;
+import br.com.marmitaria.exception.ingrediente.IngredienteNaoEncontradoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +23,7 @@ public class IngredienteServiceImpl implements IngredienteService {
     @Transactional
     public Ingrediente cadastrarIngrediente(CadastroIngredienteDTO dto) {
         if (ingredienteRepository.existsByNomeIgnoreCaseAndCategoria(dto.nome(), dto.categoria())) {
-            throw new IllegalArgumentException("Ingrediente já cadastrado");
+            throw new IngredienteJaExistenteException(dto.nome());
         }
 
         Ingrediente ingrediente = new Ingrediente(
@@ -35,7 +37,7 @@ public class IngredienteServiceImpl implements IngredienteService {
     @Override
     public RespostaIngredienteDTO listarIngredientePorId(long id) {
         Ingrediente ingrediente = ingredienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ingrediente não encontrado."));
+                .orElseThrow(() -> new IngredienteNaoEncontradoException(id));
 
         return new RespostaIngredienteDTO(
                 ingrediente.getId(),
@@ -57,11 +59,11 @@ public class IngredienteServiceImpl implements IngredienteService {
     @Transactional
     public RespostaIngredienteDTO atualizarIngrediente(Long id, CadastroIngredienteDTO dto) {
         if (ingredienteRepository.existsByNomeIgnoreCase(dto.nome())) {
-            throw new IllegalArgumentException("Ingrediente já cadastrado.");
+            throw new IngredienteJaExistenteException(dto.nome());
         }
 
         Ingrediente ingrediente = ingredienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ingrediente não encontrado."));
+                .orElseThrow(() -> new IngredienteNaoEncontradoException(id));
 
         ingrediente.atualizarDados(dto.nome(), dto.categoria());
         ingredienteRepository.save(ingrediente);
@@ -77,7 +79,7 @@ public class IngredienteServiceImpl implements IngredienteService {
     @Transactional
     public void removerIngrediente(Long id) {
         Ingrediente ingrediente = ingredienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ingrediente não encontrado."));
+                .orElseThrow(() -> new IngredienteNaoEncontradoException(id));
 
         ingredienteRepository.delete(ingrediente);
     }

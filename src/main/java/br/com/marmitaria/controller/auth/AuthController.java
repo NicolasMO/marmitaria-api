@@ -2,6 +2,10 @@ package br.com.marmitaria.controller.auth;
 
 import br.com.marmitaria.dto.auth.LoginDTO;
 import br.com.marmitaria.dto.auth.TokenDTO;
+import br.com.marmitaria.dto.usuario.CadastroUsuarioDTO;
+import br.com.marmitaria.entity.usuario.Usuario;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,10 +19,13 @@ import br.com.marmitaria.service.auth.AuthService;
 @RequestMapping("/auth")
 public class AuthController {
     
-    private final AuthService authService;
+    @Autowired
+    AuthService authService;
 
-    public AuthController(AuthService authService) {
-        this.authService = authService;
+    @PostMapping("/register")
+    public ResponseEntity<Usuario> cadastrarUsuario(@Valid @RequestBody CadastroUsuarioDTO cadastroUsuarioDTO) {
+        Usuario criado = authService.cadastrarUsuario(cadastroUsuarioDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(criado);
     }
 
     @PostMapping("/login")

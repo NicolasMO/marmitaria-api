@@ -36,7 +36,6 @@ public class Produto {
 	@Column(name = "preco_unitario", nullable = false, precision = 6, scale = 2)
 	private BigDecimal precoUnitario;
 
-    @NotBlank
 	@Column(nullable = false)
 	private String imagem;
 

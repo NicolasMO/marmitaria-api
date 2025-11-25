@@ -1,10 +1,7 @@
 package br.com.marmitaria.service.carrinho;
 
 import br.com.marmitaria.config.security.AuthenticatedUser;
-import br.com.marmitaria.dto.carrinho.AdicionarCarrinhoItemDTO;
-import br.com.marmitaria.dto.carrinho.AlterarQuantidadeCarrinhoItemDTO;
-import br.com.marmitaria.dto.carrinho.RespostaCarrinhoDTO;
-import br.com.marmitaria.dto.carrinho.RespostaCarrinhoItemDTO;
+import br.com.marmitaria.dto.carrinho.*;
 import br.com.marmitaria.entity.carrinho.Carrinho;
 import br.com.marmitaria.entity.carrinho.CarrinhoItem;
 import br.com.marmitaria.entity.ingrediente.Ingrediente;
@@ -22,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -53,7 +49,9 @@ public class CarrinhoServiceImpl implements CarrinhoService {
         Carrinho carrinho = carrinhoRepository.findByUsuarioId(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Carrinho não encontrado."));
 
-        return mapCarrinhoToDTO(carrinho);
+        RespostaTotaisCarrinhoDTO totais = carrinhoRepository.calcularTotais(carrinho.getId());
+
+        return mapCarrinhoToDTO(carrinho, totais);
     }
 
     @Override
@@ -83,7 +81,9 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 
             if (bebidaExistente != null) {
                 bebidaExistente.setQuantidade(bebidaExistente.getQuantidade() + 1);
-                return mapCarrinhoToDTO(carrinhoRepository.save(carrinho));
+                carrinhoRepository.save(carrinho);
+                RespostaTotaisCarrinhoDTO totais = carrinhoRepository.calcularTotais(carrinho.getId());
+                return mapCarrinhoToDTO(carrinho, totais);
             }
         }
 
@@ -98,7 +98,8 @@ public class CarrinhoServiceImpl implements CarrinhoService {
         carrinho.getItens().add(item);
         carrinhoRepository.save(carrinho);
 
-        return mapCarrinhoToDTO(carrinho);
+        RespostaTotaisCarrinhoDTO totais = carrinhoRepository.calcularTotais(carrinho.getId());
+        return mapCarrinhoToDTO(carrinho, totais);
     }
 
     @Override
@@ -124,7 +125,8 @@ public class CarrinhoServiceImpl implements CarrinhoService {
         item.setQuantidade(dto.quantidade());
         carrinhoRepository.save(carrinho);
 
-        return mapCarrinhoToDTO(carrinho);
+        RespostaTotaisCarrinhoDTO totais = carrinhoRepository.calcularTotais(carrinho.getId());
+        return mapCarrinhoToDTO(carrinho, totais);
     }
 
     @Override
@@ -175,7 +177,7 @@ public class CarrinhoServiceImpl implements CarrinhoService {
         };
     }
 
-    private RespostaCarrinhoDTO mapCarrinhoToDTO(Carrinho carrinho) {
+    private RespostaCarrinhoDTO mapCarrinhoToDTO(Carrinho carrinho, RespostaTotaisCarrinhoDTO totais) {
 
         List<RespostaCarrinhoItemDTO> itens = carrinho.getItens().stream()
                 .map(item -> new RespostaCarrinhoItemDTO(
@@ -190,16 +192,12 @@ public class CarrinhoServiceImpl implements CarrinhoService {
                 ))
                 .toList();
 
-        int totalProdutos = itens.stream().mapToInt(RespostaCarrinhoItemDTO::quantidade).sum();
-        BigDecimal valorTotal = itens.stream().map(item -> item.precoUnitario().multiply(BigDecimal.valueOf(item.quantidade())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
         return new RespostaCarrinhoDTO(
                 carrinho.getId(),
                 carrinho.getUsuario().getId(),
                 itens,
-                totalProdutos,
-                valorTotal
+                totais.getTotalProdutos(),
+                totais.getValorTotal()
         );
     }
 }

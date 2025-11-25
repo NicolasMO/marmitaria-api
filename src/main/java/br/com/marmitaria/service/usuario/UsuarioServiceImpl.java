@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.marmitaria.dto.usuario.CadastroUsuarioDTO;
 import br.com.marmitaria.entity.usuario.Usuario;
 import br.com.marmitaria.repository.usuario.UsuarioRepository;
 
@@ -34,28 +33,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 	public Optional<Usuario> buscarUsuario() {
         Long usuarioId = authenticatedUser.getId();
         return usuarioRepository.findById(usuarioId);
-	}
-
-	@Override
-	@Transactional
-	public Usuario cadastrarUsuario(CadastroUsuarioDTO dto) {
-		if (usuarioRepository.existsByEmail(dto.email())) {
-            throw new IllegalArgumentException("E-mail já cadastrado.");
-        }
-
-        if (usuarioRepository.existsByCpf(dto.cpf())) {
-            throw new IllegalArgumentException(("CPF já cadastrado."));
-        }
-
-        Usuario usuario = new Usuario(
-                dto.nome(),
-                dto.email(),
-                dto.cpf(),
-                dto.celular(),
-                passwordEncoder.encode(dto.senha())
-        );
-
-        return usuarioRepository.save(usuario);
 	}
 
     @Override
