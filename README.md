@@ -1,154 +1,319 @@
-API da Marmitaria (Em desenvolvimento)
+# 🖥️ Projeto de Estudo - Marmitaria
 
-Este repositório contém o **back-end** da aplicação de uma marmitaria, desenvolvido com **Java 17 e Spring Boot 3**. Ele fornece os endpoints necessários para gerenciar usuários, produtos, carrinho de compras e pedidos.  
+## 💡 Sobre o Projeto
 
- Link para o repositório do front-end: [marmitaria-web](https://github.com/NicolasMO/marmitaria-web)  
+O projeto é um sistema de gerenciamento de **Marmitaria**, permitindo cadastro e gerenciamento de produtos, ingredientes, usuários, carrinhos e pedidos.  
+Foi desenvolvido com foco em back-end robusto, utilizando Spring boot e com JWT para autenticação e validação de dados.
 
- 
-Tecnologias Utilizadas  
-Java 17  
-Spring Boot 3  
-JPA / Hibernate  
-Lombok  
-Spring Security  
-Banco de Dados PostgresSQL  
-CORS Configurado para Front-end.  
+Este sistema realiza:
+- Gerenciamento e autenticação de usuários
+- Registro de endereço para usuários
+- Registro de produtos e ingredientes
+- Montagem de carrinho com diferentes itens
+- Integração com serviços externos como ViaCEP
 
-Funcionalidades implementadas até o momento  
-✅ Autenticação e login de usuários  
-✅ Cadastro e listagem de produtos  
-✅ Adição, remoção e modificação de produtos do carrinho  
-✅ Montagem de marmitas personalizadas  
-✅ Regras de negócio para cálculo de valores  
+Futuras atualizações:
+- Implementação de pedidos
+- Relatórios de pedidos de produtos
+- Redução de Boilerplate dos services utilizando factories, modelmappers e helpers
+- Implementação de exceções personalizadas para melhor mensagem de erro para front-end
+- Implementação de estoque de produtos.
 
-Funcionalidades em Desenvolvimento  
-🔄 Finalização de pedidos  
-🔄 Cadastro de novos usuários  
+---
 
-Antes de começar, você precisará ter os seguintes itens instalados:  
-- [Java 17](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)  
-- [Maven](https://maven.apache.org/download.cgi)  
-- [PostgreSQL](https://www.postgresql.org/download/)  
+## 🚀 Tecnologias Utilizadas
+- Java 17  
+- Spring Boot 3.3.6  
+- Spring Security + JWT  
+- Spring Data JPA
+- Spring Validation
+- Spring Web   
+- Postgres  
+- Lombok  
+- Migrations Flyway  
+- Docker Container
 
-**Clone o repositório:** 
-git clone https://github.com/seu-usuario/marmitaria-backend.git
+---
 
-```sql
-Configure o banco de dados:  
-spring.datasource.url=jdbc:postgresql://localhost:5432/marmitaria  
-spring.datasource.username=seu_usuario  
-spring.datasource.password=sua_senha  
-spring.jpa.hibernate.ddl-auto=update  
+## 📦 Como Executar o Projeto
+Antes de executar, é necessário reiniciar o container Docker e limpar os volumes (para resetar o banco de dados e garantir um ambiente limpo de testes).
+
+Para usuários Linux / WSL / macOS:
+Execute os comandos abaixo com sudo, pois o Docker pode exigir permissões administrativas:
+
+- `sudo docker compose down -v`
+- `sudo docker compose up -d`
+
+---
+
+Para usuários Windows (Docker Desktop):
+Você pode executar os mesmos comandos sem sudo:
+
+- `docker compose down -v`
+- `docker compose up -d`
+
+Esses comandos garantem que o banco de dados será reconfigurado corretamente antes dos testes.
+Se não forem executados, os testes podem falhar devido a dados persistentes ou estado inconsistente.  
+Ele inicializará por padrão na porta **5432**.
+
+---
+
+### Com Maven:
+```bash
+./mvnw spring-boot:run
 ```
-O servidor estará disponível em http://localhost:8080
 
-Principais endpoints  
-___
-Cadastro de Usuário
-POST /usuario
+---
+
+## 🔐 Autenticação
+
+Autenticação baseada em JWT, com token Bearer enviado no header Authorization.  
+Talvez seja necessário configurar o postman para acessar endpoints restritos.
+
+### 🔸 Login
+
+```http
+POST /auth/login
+```
+
+Request:
+```json
+{ "email": "email@exemplo.com", "senha": "SenhaForte123" }
+```
+Response:
+```json
+{ "token": "eyJhbGciOiJIUzI1NiJ9..." }
+```
+
+---
+
+## 🧩 Modelo Entidade-Relacionamento (MER)
+
+
+- `usuario`: id, nome, email, senha, celular, cpf
+- `endereco`: id, logradouro, numero, cidade, bairro, estado, complemento, cep, usuario_id (FK)
+- `produto`: id, nome, preco_unitario, imagem, tipo
+- `ingrediente`: id, nome, categoria
+- `carrinho`: id, usuario_id (FK)
+- `carrinho_item`: id, quantidade, observacao, carrinho_id (FK), produto_id (FK) 
+- `carrinho_item_ingrediente`: carrinho_item_id (PK), ingrediente_id (PK) `Chave composta`
+- `pedido`: id, data_pedido, total, endereco_entrega, forma_pagamento, status, usuario_id (FK)
+- `pedido_item`: id, quantidade, observacao, pedido_id (FK), produto_id (FK)
+- `pedido_item_ingrediente`: pedido_item_id (PK), ingrediente_id (PK) `Chave composta`
+
+![marmitaria-diagrama.png](marmitaria-diagrama.png)
+
+---
+
+## 📜 Regras de Negócio
+### 👤 1. Agregado: Usuário
+**Entidade raiz:** `Usuario`  
+**Outras entidades relacionadas:** `Endereco`, `Carrinho`, `Pedido`
+
+### Regras
+
+- Um usuário pode ter **nenhum ou 3** endereços cadastrados.
+- Um endereço pertence a **somente um** usuário. Podem existir **endereços iguais** para **diferentes usuários**.
+- Um usuário **não pode ter** endereços repetidos.
+- Um usuário pode ter **nenhum ou 1** carrinho.
+- Um usuário pode ter **nenhum ou vários** pedidos.
+- Campos obrigatórios do usuário: `nome`, `email`, `senha`, `celular`, `cpf`
+- `email` e `cpf` devem ser **únicos** no sistema.
+- O usuário deve estar autenticado (**JWT**) para acessar recursos privados.
+
+---
+
+### 📦 2. Agregado: Produto
+**Entidade raiz:** `Produto`  
+**Outras entidades relacionadas:** `Ingrediente`  
+**Valores de domínio (enum):**
+- Tipo de produto: `MARMITA_PEQUENA`, `MARMITA_GRANDE`, `BEBIDA`
+- Categoria de ingrediente: `PROTEINA`, `CARBOIDRATO`, `COMPLEMENTO`  
+
+
+### Regras
+
+- Campos obrigatórios de `Produto`: **nome**, **precoUnitario**, **tipo**.
+- Campos obrigatórios de `Ingrediente`: **nome**, **categoria**.
+- Produtos do tipo `MARMITA` devem ter ingredientes, do tipo `BEBIDA` não.
+- Cada ingrediente possui uma `CATEGORIA` definida pelo enum `CategoriaIngrediente`.
+- Produtos e ingredientes são apenas **itens de referência**, a montagem das marmitas ocorre no carrinho.
+- Não podem ter Produtos e Ingredientes com **nomes** repetidos.
+- **Preço** de produto não pode ser **negativo** e não pode passar de R$ **9999.99**.
+
+---
+
+### 🛒 3. Agregado: Carrinho
+**Entidade raiz:** `Carrinho`  
+**Outras entidades relacionadas:** `CarrinhoItem`, `CarrinhoItemIngrediente`, `Produto`, `Ingrediente`
+
+### Regras
+
+- Produtos do tipo `MARMITA` são **únicos por carrinho**; cada montagem é individual.
+- Produtos do tipo `BEBIDA` podem **stackar em quantidade**.
+- O carrinho valida a quantidade de ingredientes por categoria, de acordo com o tipo de Marmita:
+
+  | Tipo de Marmita       | Proteína | Carboidrato | Complemento |
+    |----------------------|----------|------------|------------|
+  | MARMITA_PEQUENA      | 1        | 1–2        | 0–2        |
+  | MARMITA_GRANDE       | 1–2      | 1–3        | 0–4        |
+
+- Ingredientes adicionados devem **estar dentro das regras permitidas** pelo tipo da Marmita.
+- É possível adicionar **observações** apenas a produtos do tipo Marmita.
+- Cada item do carrinho armazena sua própria lista de ingredientes.
+- Bebidas não têm ingredientes e podem ser agrupadas em quantidade.  
+- **Apenas um** produto é inserido por vez.
+- **Todos** os produtos são inseridos no carrinho com quantidade 1. Apenas produtos do tipo `BEBIDA` podem ter alteração de quantidade.
+- **Não é permitido** quantidade 0. Deve ser feito a **remoção** do item.
+
+---
+
+
+### 📑 4. Agregado: Pedido
+**Entidade raiz:** `Pedido`  
+**Outras entidades relacionadas:** `PedidoItem`, `PedidoItemIngrediente`, `Produto`, `Ingrediente`
+
+### Regras
+
+- Um pedido é gerado **a partir do carrinho** ao finalizar a compra.
+- Mantém a mesma lógica de produtos e ingredientes do carrinho:
+    - Marmitas são únicas por item
+    - Bebidas podem stackar
+    - Ingredientes devem respeitar as regras de tipo da Marmita
+    - Observações válidas apenas em Marmitas
+- Campos adicionais do Pedido:
+    - `data_pedido` → data da finalização do pedido
+    - `total` → valor total calculado com base nos itens
+    - `endereco_entrega` → endereço escolhido do usuário
+    - `forma_pagamento` → método de pagamento selecionado
+    - `status` → situação do pedido (ex.: AGUARDANDO_PAGAMENTO, ENVIADO)
+- Itens do pedido **não podem ser alterados** após a finalização.
+
+
+---
+
+# Endpoints
+
+## 🔑 Autenticação
+- `POST /auth/register` - Cadastro de usuários
 ```json
 {
-  "nome": "usuario",
-  "senha": "senha123",
-  "email": "usuario@example.com",
-  "celular": "99999999999"
+    "nome": "Exemplo",
+    "senha": "SenhaForte123",
+    "email": "exemplo@example.com",
+    "celular": "88888888888",
+    "cpf": "38655419095"
 }
 ```
----
-Buscar Usuário 
 
-GET /usuario → Retorna todos os usuários
-
-GET /usuario/{id} → Retorna um usuário específico
-
----
-Listar Produtos e Ingredientes
-
-GET /produtos → Lista todos os produtos
-
-GET /ingredientes → Lista todos os ingredientes
+- `POST /auth/login` - Login de usuários
+```json
+{ 
+  "email": "email@exemplo.com", 
+  "senha": "SenhaForte123"
+}
+```
 
 ---
 
-Adicionar Item ao Carrinho
-POST /carrinho/adicionar
+## 👤 Usuário
+- `GET /usuarios` - Retorna informações de todos os usuários
+- `GET /usuarios/info` - Retorna informação do usuário autenticado
+- `DELETE /usuarios/{id}` - Deleção de usuário
+
+---
+
+## 🏠 Endereço
+- `GET /enderecos/buscar` - Retorna lista de endereços do usuário autenticado
+- `POST /enderecos` - Cadastro de endereço do usuário autenticado
 ```json
 {
-  "usuarioId": 2,
-  "produtoId": 5,
+  "cep": "01001000",
+  "numero": "1",
+  "complemento": "Casa azul"
+}
+```
+
+- `DELETE /enderecos/{id}` - Deleção de endereço do usuário autenticado
+
+---
+
+## 🥗 Ingrediente
+- `GET /ingredientes` - Retorna lista de ingredientes
+- `GET /ingredientes/{id}` - Retorna ingrediente especificado
+- `POST /ingredientes` - Cadastro de ingrediente
+```json
+{
+  "nome": "Peito de Frango",
+  "categoria": "PROTEINA"
+}
+```
+
+- `PUT /ingredientes/{id}` - Atualiza campos do ingrediente especificado
+```json
+{
+"nome": "Peito de Frango Desfiado",
+"categoria": "PROTEINA"
+}
+```
+
+- `DELETE /ingredientes/{id}` - Deleção de ingrediente especificado
+
+---
+
+## 🍱 Produto
+- `GET /produtos` - Retorna lista de produtos
+- `POST /produtos` - Cadastro de produtos
+```json
+{
+  "nome": "refrigerante lata",
+  "precoUnitario": 6.50,
+  "tipo": "BEBIDA"
+}
+```
+
+- `PUT /produtos/{id}` - Atualiza campos do produto especificado
+```json
+{
+  "nome": "Refraigeras",
+  "precoUnitario": 8.00,
+  "tipo": "BEBIDA"
+}
+```
+
+- `DELETE /produtos/{id}` - Deleção de produto especificado
+
+---
+
+## 🛒 Carrinho
+- `GET /carrinho` - Retorna carrinho do usuário autenticado
+- `POST /carrinho/item` - Inclusão de produtos no carrinho do usuário autenticado  
+
+
+**Marmitas**
+```json
+{
+  "produtoId": 1,
+  "ingredientesId": [1, 7, 8],
+  "observacao": "sem cebola"
+}
+```
+
+**Outros produtos**
+```json
+{
+  "produtoId": 4
+}
+```
+
+- `PUT /carrinho/item/{id}/quantidade` - Atualiza o campo quantidade do item
+```json
+{
   "quantidade": 2
 }
-  ```
-
-Adicionar Marmita ao Carrinho
-POST /carrinho/adicionar
-
-```json
-{
-  "usuarioId": 2,
-  "produtoId": 1,
-  "quantidade": 1,
-  "marmitaDTO": {
-    "ingredientesId": []
-} 
 ```
-  ---
-Listar Itens do Carrinho
 
-GET /carrinho/{usuarioId}
-
-Limpar Carrinho
-
-DELETE /carrinho/{usuarioId}
-
-Remover Item do Carrinho
-
-DELETE /carrinho/{usuarioId}/{itemId}
+- `DELETE /carrinho/item/{id}` - Deleção de item do carrinho
+- `DELETE /carrinho/limpar` - Limpeza de itens do carrinho
 
 ---
-Autenticação (Login)
-POST /auth/login
-  ```json
-    "email": "usuario@example.com",
-    "senha": "senha123"
-```
-⚠ Importante: Algumas ações, como adicionar itens ao carrinho, exigem que o usuário esteja autenticado.
-
-
-Necessário popular o banco com os seguintes dados antes de iniciar o projeto:
-
-```sql
--- Produtos
-INSERT INTO produto (nome, preco, tipo, imagem) VALUES
-('Marmita Pequena', 12.0, 'MARMITA_PEQUENA', 'marmitapequena.jpg'),
-('Marmita Grande', 16.0, 'MARMITA_GRANDE', 'marmitagrande.jpg'),
-('Coca-Cola Lata', 5.0, 'BEBIDA', 'cocalata.jpg'),
-('Coca Zero Lata', 6.0, 'BEBIDA', 'cocazerolata.jpg'),
-('Fanta Laranja Lata', 5.0, 'BEBIDA', 'fantalata.jpg'),
-('Guaraná Lata', 5.0, 'BEBIDA', 'guaranalata.jpg'),
-('Água Mineral', 3.0, 'BEBIDA', 'agua.jpg');
-
-
--- Ingredientes
-
-INSERT INTO ingrediente (categoria, nome) VALUES
-('PROTEINA', 'Peito de frango assado'),
-('PROTEINA', 'Carne trinchada'),
-('PROTEINA', 'Omelete c/ frango e queijo'),
-('PROTEINA', 'Almondegas'),
-('PROTEINA', 'Bife de Soja'),
-('CARBOIDRATO', 'Arroz branco'),
-('CARBOIDRATO', 'Baião'),
-('CARBOIDRATO', 'Feijão Carioca'),
-('CARBOIDRATO', 'Macarrão ao alho e óleo'),
-('CARBOIDRATO', 'Arroz integral'),
-('COMPLEMENTO', 'Batata cozida'),
-('COMPLEMENTO', 'Vinagrete'),
-('COMPLEMENTO', 'Repolho refogado'),
-('COMPLEMENTO', 'Batata doce cozida'),
-('COMPLEMENTO', 'Suflê de xuxu'),
-('COMPLEMENTO', 'Salada verde'),
-('COMPLEMENTO', 'Cenoura ralada'),
-('COMPLEMENTO', 'Legumes com maionese'),
-('COMPLEMENTO', 'Farofa de ovo'),
-('COMPLEMENTO', 'Abóbora cozida');
