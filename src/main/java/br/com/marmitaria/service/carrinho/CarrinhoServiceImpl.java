@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -189,10 +190,16 @@ public class CarrinhoServiceImpl implements CarrinhoService {
                 ))
                 .toList();
 
+        int totalProdutos = itens.stream().mapToInt(RespostaCarrinhoItemDTO::quantidade).sum();
+        BigDecimal valorTotal = itens.stream().map(item -> item.precoUnitario().multiply(BigDecimal.valueOf(item.quantidade())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         return new RespostaCarrinhoDTO(
                 carrinho.getId(),
                 carrinho.getUsuario().getId(),
-                itens
+                itens,
+                totalProdutos,
+                valorTotal
         );
     }
 }
