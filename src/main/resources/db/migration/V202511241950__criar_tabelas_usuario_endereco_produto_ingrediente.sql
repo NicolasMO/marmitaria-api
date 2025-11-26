@@ -1,5 +1,5 @@
 CREATE TABLE usuario (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     senha VARCHAR(100) NOT NULL,
@@ -8,8 +8,8 @@ CREATE TABLE usuario (
 );
 
 CREATE TABLE endereco (
-    id SERIAL PRIMARY KEY,
-    usuario_id INT NOT NULL REFERENCES usuario(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    usuario_id BIGINT NOT NULL REFERENCES usuario(id) ON DELETE CASCADE,
     logradouro VARCHAR(255) NOT NULL,
     numero VARCHAR(20),
     cidade VARCHAR(150) NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE endereco (
 );
 
 CREATE TABLE produto (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     preco_unitario NUMERIC(6,2) NOT NULL,
     imagem VARCHAR(255),
@@ -28,7 +28,7 @@ CREATE TABLE produto (
 );
 
 CREATE TABLE ingrediente (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     categoria VARCHAR(20) NOT NULL
 );
