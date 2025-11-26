@@ -35,9 +35,4 @@ public class Ingrediente {
         this.nome = nome;
         this.categoria = categoria;
     }
-
-    public void atualizarDados (String nome, CategoriaIngrediente categoria) {
-        this.nome = nome;
-        this.categoria = categoria;
-    }
 }

@@ -2,7 +2,9 @@ package br.com.marmitaria.service.ingrediente;
 
 import java.util.List;
 
+import br.com.marmitaria.dto.ingrediente.AtualizarIngredienteDTO;
 import br.com.marmitaria.dto.ingrediente.RespostaIngredienteDTO;
+import br.com.marmitaria.exception.RequisicaoVaziaException;
 import br.com.marmitaria.exception.ingrediente.IngredienteJaExistenteException;
 import br.com.marmitaria.exception.ingrediente.IngredienteNaoEncontradoException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,7 @@ public class IngredienteServiceImpl implements IngredienteService {
     @Override
     @Transactional
     public Ingrediente cadastrarIngrediente(CadastroIngredienteDTO dto) {
-        if (ingredienteRepository.existsByNomeIgnoreCaseAndCategoria(dto.nome(), dto.categoria())) {
+        if (ingredienteRepository.existsByNomeIgnoreCase(dto.nome())) {
             throw new IngredienteJaExistenteException(dto.nome());
         }
 
@@ -57,16 +59,30 @@ public class IngredienteServiceImpl implements IngredienteService {
 
     @Override
     @Transactional
-    public RespostaIngredienteDTO atualizarIngrediente(Long id, CadastroIngredienteDTO dto) {
-        if (ingredienteRepository.existsByNomeIgnoreCase(dto.nome())) {
-            throw new IngredienteJaExistenteException(dto.nome());
+    public RespostaIngredienteDTO atualizarIngrediente(Long id, AtualizarIngredienteDTO dto) {
+        boolean nenhumCampoEnviado =
+                (dto.nome() == null || dto.nome().isBlank()) &&
+                        dto.categoria() == null;
+
+        if (nenhumCampoEnviado) {
+            throw new RequisicaoVaziaException("Envie ao menos um campo para atualização.");
         }
 
         Ingrediente ingrediente = ingredienteRepository.findById(id)
                 .orElseThrow(() -> new IngredienteNaoEncontradoException(id));
 
-        ingrediente.atualizarDados(dto.nome(), dto.categoria());
-        ingredienteRepository.save(ingrediente);
+        if (dto.nome() != null && !dto.nome().isBlank()) {
+            boolean jaExiste = ingredienteRepository.existsByNomeIgnoreCase(dto.nome());
+            if (jaExiste && !ingrediente.getNome().equalsIgnoreCase(dto.nome())) {
+                throw new IngredienteJaExistenteException(dto.nome());
+            }
+
+            ingrediente.setNome(dto.nome());
+        }
+
+        if (dto.categoria() != null) {
+            ingrediente.setCategoria(dto.categoria());
+        }
 
         return new RespostaIngredienteDTO(
                 ingrediente.getId(),

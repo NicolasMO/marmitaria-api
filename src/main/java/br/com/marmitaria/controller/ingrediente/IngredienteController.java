@@ -2,6 +2,7 @@ package br.com.marmitaria.controller.ingrediente;
 
 import java.util.List;
 
+import br.com.marmitaria.dto.ingrediente.AtualizarIngredienteDTO;
 import br.com.marmitaria.dto.ingrediente.CadastroIngredienteDTO;
 import br.com.marmitaria.dto.ingrediente.RespostaIngredienteDTO;
 import br.com.marmitaria.service.ingrediente.IngredienteService;
@@ -38,8 +39,8 @@ public class IngredienteController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ingrediente);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<RespostaIngredienteDTO> atualizarIngrediente(@PathVariable Long id, @Valid @RequestBody CadastroIngredienteDTO dto) {
+    @PatchMapping("/{id}")
+    public ResponseEntity<RespostaIngredienteDTO> atualizarIngrediente(@PathVariable Long id, @RequestBody AtualizarIngredienteDTO dto) {
         RespostaIngredienteDTO ingrediente = ingredienteService.atualizarIngrediente(id, dto);
         return ResponseEntity.status(HttpStatus.OK).body(ingrediente);
     }

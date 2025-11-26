@@ -1,6 +1,7 @@
 package br.com.marmitaria.exception.handler;
 
 import br.com.marmitaria.dto.erro.RespostaErroAPI;
+import br.com.marmitaria.exception.RequisicaoVaziaException;
 import br.com.marmitaria.exception.ingrediente.IngredienteJaExistenteException;
 import br.com.marmitaria.exception.ingrediente.IngredienteNaoEncontradoException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +38,22 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resposta);
+    }
+
+    @ExceptionHandler(RequisicaoVaziaException.class)
+    public ResponseEntity<RespostaErroAPI> handleRequisicaoVazia(
+            RequisicaoVaziaException ex,
+            HttpServletRequest request
+    ) {
+        RespostaErroAPI erro = new RespostaErroAPI(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getClass().getSimpleName(),
+                ex.getMessage(),
+                List.of(ex.getMessage()),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
     }
 
     @ExceptionHandler(IngredienteNaoEncontradoException.class)
