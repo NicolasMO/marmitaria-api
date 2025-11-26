@@ -56,7 +56,7 @@ public class ProdutoServiceImpl implements ProdutoService {
         Produto produto = produtoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
 
-        produto.atualizarDados(dto.nome(), dto.precoUnitario(), dto.tipo());
+        produto.atualizarDados(dto.nome(), dto.precoUnitario());
         produtoRepository.save(produto);
 
         return new RespostaProdutoDTO(

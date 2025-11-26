@@ -49,9 +49,8 @@ public class Produto {
         this.tipo = tipo;
     }
 
-    public void atualizarDados(String nome, BigDecimal precoUnitario, TipoProduto tipo) {
+    public void atualizarDados(String nome, BigDecimal precoUnitario) {
         this.nome = nome;
         this.precoUnitario = precoUnitario;
-        this.tipo = tipo;
     }
 }

@@ -248,7 +248,7 @@ Response:
 }
 ```
 
-- `PATCH /ingredientes/{id}` - Atualiza campos do ingrediente especificado de forma parcial
+- `PATCH /ingredientes/{id}` - Atualiza campos do ingrediente especificado de forma parcial ou integral
 ```json
 {
 "nome": "Peito de Frango Desfiado",
