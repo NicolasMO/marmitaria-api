@@ -219,6 +219,7 @@ Response:
 ## 👤 Usuário
 - `GET /usuarios` - Retorna informações de todos os usuários
 - `GET /usuarios/info` - Retorna informação do usuário autenticado
+- `GET /usuarios/{id}` - Retorna informação do usuário com id informado
 - `DELETE /usuarios/{id}` - Deleção de usuário
 
 ---
