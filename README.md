@@ -115,6 +115,7 @@ Response:
 - Um usuário pode ter **nenhum ou 3** endereços cadastrados.
 - Um endereço pertence a **somente um** usuário. Podem existir **endereços iguais** para **diferentes usuários**.
 - Um usuário **não pode ter** endereços repetidos.
+- **Não é possível** alterar dados do endereço.
 - Um usuário pode ter **nenhum ou 1** carrinho.
 - Um usuário pode ter **nenhum ou vários** pedidos.
 - Campos obrigatórios do usuário: `nome`, `email`, `senha`, `celular`, `cpf`
@@ -221,12 +222,9 @@ Response:
 - `GET /usuarios/info` - Retorna informação do usuário autenticado
 - `GET /usuarios/{id}` - Retorna informação do usuário com id informado
 - `DELETE /usuarios/{id}` - Deleção de usuário
-
----
-
-## 🏠 Endereço
-- `GET /enderecos/buscar` - Retorna lista de endereços do usuário autenticado
-- `POST /enderecos` - Cadastro de endereço do usuário autenticado
+- `GET /usuarios/me/endereco/buscar` - Retorna lista de endereços do usuário autenticado
+- `GET /usuarios/me/endereco/{id}` - Retorna lista de endereços do usuário autenticado
+- `POST /usuarios/me/endereco` - Cadastro de endereço do usuário autenticado
 ```json
 {
   "cep": "01001000",
@@ -235,7 +233,7 @@ Response:
 }
 ```
 
-- `DELETE /enderecos/{id}` - Deleção de endereço do usuário autenticado
+- `DELETE /usuarios/me/endereco/{id}` - Deleção de endereço do usuário autenticado
 
 ---
 

@@ -1,7 +1,6 @@
 package br.com.marmitaria.service.usuario;
 
 import java.util.List;
-import java.util.Optional;
 
 import br.com.marmitaria.config.security.AuthenticatedUser;
 import br.com.marmitaria.dto.endereco.RespostaEnderecoDTO;
@@ -118,7 +117,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional
-    public void removerUsuario(long id) {
+    public void removerUsuario(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 

@@ -34,7 +34,7 @@ public class EnderecoServiceImpl implements EnderecoService {
 	
 	@Override
 	@Transactional
-	public Endereco cadastrarEndereco(CadastroEnderecoDTO dto) {
+	public RespostaEnderecoDTO cadastrarEndereco(CadastroEnderecoDTO dto) {
 
         Long usuarioId = authenticatedUser.getId();
 		Usuario usuario = usuarioRepository.findById(usuarioId)
@@ -61,7 +61,18 @@ public class EnderecoServiceImpl implements EnderecoService {
                 usuario
 				);
 		
-		return enderecoRepository.save(endereco);
+		enderecoRepository.save(endereco);
+
+        return new RespostaEnderecoDTO(
+                endereco.getId(),
+                endereco.getLogradouro(),
+                endereco.getNumero(),
+                endereco.getBairro(),
+                endereco.getCidade(),
+                endereco.getEstado(),
+                endereco.getComplemento(),
+                endereco.getCep()
+        );
 	}
 
     @Override
@@ -83,6 +94,28 @@ public class EnderecoServiceImpl implements EnderecoService {
                         e.getCep()
                 )).toList();
     };
+
+    @Override
+    public RespostaEnderecoDTO listarEnderecoDoUsuarioPorID(Long id) {
+
+        Long usuarioId = authenticatedUser.getId();
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+
+        Endereco endereco = enderecoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Endereço não encontrado."));
+
+        return new RespostaEnderecoDTO(
+                endereco.getId(),
+                endereco.getLogradouro(),
+                endereco.getNumero(),
+                endereco.getBairro(),
+                endereco.getCidade(),
+                endereco.getEstado(),
+                endereco.getComplemento(),
+                endereco.getCep()
+        );
+    }
 
     @Override
     @Transactional
