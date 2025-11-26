@@ -7,5 +7,5 @@ import br.com.marmitaria.entity.produto.Produto;
 
 @Repository
 public interface ProdutoRepository extends JpaRepository<Produto, Long>{
-
+    boolean existsByNomeIgnoreCase(String nome);
 }

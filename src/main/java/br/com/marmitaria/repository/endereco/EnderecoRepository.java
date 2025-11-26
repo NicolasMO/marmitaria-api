@@ -7,5 +7,5 @@ import br.com.marmitaria.entity.endereco.Endereco;
 
 @Repository
 public interface EnderecoRepository extends JpaRepository<Endereco, Long> {
-
+    boolean existsByUsuarioIdAndNumeroAndComplementoIgnoreCase(Long usuarioId, String numero, String complemento);
 }

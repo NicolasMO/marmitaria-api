@@ -1,8 +1,11 @@
 package br.com.marmitaria.service.auth;
 
-import br.com.marmitaria.dto.security.LoginRequestDTO;
-import br.com.marmitaria.dto.security.LoginResponseDTO;
+import br.com.marmitaria.dto.auth.LoginDTO;
+import br.com.marmitaria.dto.auth.TokenDTO;
+import br.com.marmitaria.dto.usuario.CadastroUsuarioDTO;
+import br.com.marmitaria.entity.usuario.Usuario;
 
 public interface AuthService {
-	LoginResponseDTO autenticar(LoginRequestDTO LoginRequest);
+    TokenDTO login(LoginDTO dto);
+    Usuario cadastrarUsuario(CadastroUsuarioDTO cadastroUsuarioDTO);
 }

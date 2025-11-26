@@ -1,176 +1,203 @@
 package br.com.marmitaria.service.carrinho;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import br.com.marmitaria.config.security.AuthenticatedUser;
+import br.com.marmitaria.dto.carrinho.*;
+import br.com.marmitaria.entity.carrinho.Carrinho;
+import br.com.marmitaria.entity.carrinho.CarrinhoItem;
+import br.com.marmitaria.entity.ingrediente.Ingrediente;
+import br.com.marmitaria.entity.produto.Produto;
+import br.com.marmitaria.entity.usuario.Usuario;
+import br.com.marmitaria.enums.TipoProduto;
+import br.com.marmitaria.repository.carrinho.CarrinhoRepository;
+import br.com.marmitaria.repository.ingrediente.IngredienteRepository;
+import br.com.marmitaria.repository.produto.ProdutoRepository;
+import br.com.marmitaria.repository.usuario.UsuarioRepository;
+import br.com.marmitaria.service.carrinho.strategy.RegraBebida;
+import br.com.marmitaria.service.carrinho.strategy.RegraMarmita;
+import br.com.marmitaria.service.carrinho.strategy.RegraProduto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.marmitaria.dto.carrinho.AdicionarItemCarrinhoDTO;
-import br.com.marmitaria.dto.carrinho.CarrinhoResponseDTO;
-import br.com.marmitaria.dto.carrinho.ItemCarrinhoDTO;
-import br.com.marmitaria.dto.carrinho.ItemCarrinhoProjection;
-import br.com.marmitaria.dto.carrinho.QtdItemCarrinhoDTO;
-import br.com.marmitaria.dto.produto.MarmitaIngredienteProjection;
-import br.com.marmitaria.dto.produto.ProdutoDTO;
-import br.com.marmitaria.entity.carrinho.Carrinho;
-import br.com.marmitaria.entity.carrinho.ItemCarrinho;
-import br.com.marmitaria.entity.produto.Marmita;
-import br.com.marmitaria.entity.produto.Produto;
-import br.com.marmitaria.entity.usuario.Usuario;
-import br.com.marmitaria.enums.CategoriaIngrediente;
-import br.com.marmitaria.enums.TipoProduto;
-import br.com.marmitaria.repository.carrinho.CarrinhoRepository;
-import br.com.marmitaria.repository.carrinho.ItemCarrinhoRepository;
-import br.com.marmitaria.repository.produto.MarmitaIngredienteRepository;
-import br.com.marmitaria.repository.produto.ProdutoRepository;
-import br.com.marmitaria.repository.usuario.UsuarioRepository;
-import br.com.marmitaria.service.produto.MarmitaService;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CarrinhoServiceImpl implements CarrinhoService {
 
-	private final CarrinhoRepository carrinhoRepository;
-	private final ItemCarrinhoRepository itemCarrinhoRepository;
-	private final MarmitaService marmitaService;
-	private final MarmitaIngredienteRepository marmitaIngredienteRepository;
-	private final ProdutoRepository produtoRepository;
-	private final UsuarioRepository usuarioRepository;
+    @Autowired
+    private AuthenticatedUser authenticatedUser;
 
-	public CarrinhoServiceImpl(CarrinhoRepository carrinhoRepository, ItemCarrinhoRepository itemCarrinhoRepository,
-			ProdutoRepository produtoRepository, MarmitaService marmitaService,
-			MarmitaIngredienteRepository marmitaIngredienteRepository, UsuarioRepository usuarioRepository) {
-		this.carrinhoRepository = carrinhoRepository;
-		this.itemCarrinhoRepository = itemCarrinhoRepository;
-		this.produtoRepository = produtoRepository;
-		this.marmitaService = marmitaService;
-		this.marmitaIngredienteRepository = marmitaIngredienteRepository;
-		this.usuarioRepository = usuarioRepository;
-	}
+    @Autowired
+    CarrinhoRepository carrinhoRepository;
 
-	public CarrinhoResponseDTO listarItensDoCarrinho(Long carrinhoId) {
-		List<ItemCarrinhoProjection> itensCarrinho = itemCarrinhoRepository.findByCarrinhoId(carrinhoId);
+    @Autowired
+    UsuarioRepository usuarioRepository;
 
-		List<Long> marmitaIds = itensCarrinho.stream().filter(item -> item.getMarmitaId() != null)
-				.map(ItemCarrinhoProjection::getMarmitaId).collect(Collectors.toList());
+    @Autowired
+    ProdutoRepository produtoRepository;
 
-		List<MarmitaIngredienteProjection> ingredientes = marmitaIngredienteRepository.findByMarmitaIds(marmitaIds);
+    @Autowired
+    IngredienteRepository ingredienteRepository;
 
-		Map<Long, Map<String, String>> ingredientesPorMarmita = ingredientes.stream().collect(
-				Collectors.groupingBy(MarmitaIngredienteProjection::getMarmitaId, Collectors.groupingBy(ingrediente -> {
-					String categoriaNome = ingrediente.getIngredienteCategoria();
+    @Override
+    public RespostaCarrinhoDTO listarCarrinho() {
+        Long usuarioId = authenticatedUser.getId();
 
-					CategoriaIngrediente categoria = CategoriaIngrediente.valueOf(categoriaNome);
-					return categoria.name().toLowerCase();
-				}, Collectors.mapping(MarmitaIngredienteProjection::getIngredienteNome, Collectors.joining(", ")))));
+        Carrinho carrinho = carrinhoRepository.findByUsuarioId(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Carrinho não encontrado."));
 
-		List<ItemCarrinhoDTO> itens = itensCarrinho.stream().map(item -> {
-			ProdutoDTO produto = new ProdutoDTO(item.getProdutoId(), item.getProdutoNome(), item.getItemPreco(),
-					item.getMarmitaId() != null ? formatarIngredientes(ingredientesPorMarmita.get(item.getMarmitaId()))
-							: null);
-			return new ItemCarrinhoDTO(item.getId(), produto, item.getQuantidade(),
-					item.getQuantidade() * item.getItemPreco());
-		}).collect(Collectors.toList());
+        RespostaTotaisCarrinhoDTO totais = carrinhoRepository.calcularTotais(carrinho.getId());
 
-		Double valorTotal = itens.stream().mapToDouble(ItemCarrinhoDTO::getPrecoTotal).sum();
+        return mapCarrinhoToDTO(carrinho, totais);
+    }
 
-		return new CarrinhoResponseDTO(itens, valorTotal);
-	}
+    @Override
+    @Transactional
+    public RespostaCarrinhoDTO adicionarItem(AdicionarCarrinhoItemDTO dto) {
+        Long usuarioId = authenticatedUser.getId();
 
-	@Transactional
-	public void adicionarItemAoCarrinho(AdicionarItemCarrinhoDTO dto) {
-		Carrinho carrinho = carrinhoRepository.findByUsuarioId(dto.getUsuarioId())
-				.orElseGet(() -> criarCarrinhoParaUsuario(dto.getUsuarioId()));
+        Carrinho carrinho = carrinhoRepository.findByUsuarioId(usuarioId)
+                .orElseGet(() -> criarCarrinho(usuarioId));
 
-		Produto produto = produtoRepository.findById(dto.getProdutoId())
-				.orElseThrow(() -> new RuntimeException("Produto não encontrado."));
+        Produto produto = produtoRepository.findById(dto.produtoId())
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
 
-		if (produto.getTipo() == TipoProduto.BEBIDA) {
-			adicionarBebidaAoCarrinho(carrinho, produto, dto.getQuantidade());
-		} else {
-			Marmita marmita = marmitaService.montarMarmita(dto.getMarmitaDTO(), dto.getProdutoId(), dto.getUsuarioId());
-			adicionarMarmitaAoCarrinho(carrinho, marmita);
-		}
+        List<Long> ingredientesId = dto.ingredientesId() != null ? dto.ingredientesId() : List.of();
+        List<Ingrediente> ingredientes = ingredienteRepository.findAllById(ingredientesId);
 
-		carrinho.recalcularValorTotal();
-		carrinhoRepository.save(carrinho);
-	}
+        if (ingredientes.size() != ingredientesId.size()) {
+            throw new RuntimeException("Um ou mais ingredientes informados não existem ou estão repetidos.");
+        }
 
-	@Transactional
-	public void limparCarrinho(Long carrinhoId) {
-		itemCarrinhoRepository.limparCarrinho(carrinhoId);
-	}
+        RegraProduto regra = obterRegra(produto);
+        regra.validar(produto, ingredientes);
 
-	@Transactional
-	public void removerItemDoCarrinho(Long itemId, Long carrinhoId) {
-		itemCarrinhoRepository.removerItemDoCarrinho(itemId, carrinhoId);
-	}
+        if (produto.getTipo() == TipoProduto.BEBIDA) {
+            CarrinhoItem bebidaExistente = carrinho.getItens().stream().filter(item -> item.getProduto().getId().equals(produto.getId()))
+                    .findFirst().orElse(null);
 
-	@Override
-	public Carrinho criarCarrinhoParaUsuario(Long usuarioId) {
-		Usuario usuario = usuarioRepository.findById(usuarioId)
-				.orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
-		Carrinho novoCarrinho = new Carrinho();
-		novoCarrinho.setUsuario(usuario);
-		return carrinhoRepository.save(novoCarrinho);
-	}
+            if (bebidaExistente != null) {
+                bebidaExistente.setQuantidade(bebidaExistente.getQuantidade() + 1);
+                carrinhoRepository.save(carrinho);
+                RespostaTotaisCarrinhoDTO totais = carrinhoRepository.calcularTotais(carrinho.getId());
+                return mapCarrinhoToDTO(carrinho, totais);
+            }
+        }
 
-	// Metodos privados
+        CarrinhoItem item = new CarrinhoItem(
+                carrinho,
+                produto,
+                1,
+                dto.observacao(),
+                new HashSet<>(ingredientes)
+        );
 
-	private void adicionarMarmitaAoCarrinho(Carrinho carrinho, Marmita marmita) {
-		ItemCarrinho itemCarrinho = new ItemCarrinho();
-		itemCarrinho.setCarrinho(carrinho);
-		itemCarrinho.setProduto(marmita.getProduto());
-		itemCarrinho.setMarmita(marmita);
-		itemCarrinho.setQuantidade(1);
-		itemCarrinho.setPreco(marmita.getProduto().getPreco());
-		itemCarrinhoRepository.save(itemCarrinho);
-		carrinho.adicionarItem(itemCarrinho);
-	}
+        carrinho.getItens().add(item);
+        carrinhoRepository.save(carrinho);
 
-	private void adicionarBebidaAoCarrinho(Carrinho carrinho, Produto produto, Integer quantidade) {
-		QtdItemCarrinhoDTO itemExistente = itemCarrinhoRepository.buscarQuantidadeDoProdutoNoCarrinho(carrinho.getId(),
-				produto.getId());
+        RespostaTotaisCarrinhoDTO totais = carrinhoRepository.calcularTotais(carrinho.getId());
+        return mapCarrinhoToDTO(carrinho, totais);
+    }
 
-		if (itemExistente != null) {
-			ItemCarrinho itemCarrinho = itemCarrinhoRepository
-					.findByCarrinhoAndProduto(carrinho.getId(), produto.getId())
-					.orElseThrow(() -> new RuntimeException("Erro ao buscar item"));
-			itemCarrinho.setQuantidade(quantidade);
-			itemCarrinho.setPreco(produto.getPreco() * quantidade);
-			itemCarrinhoRepository.save(itemCarrinho);
-		} else {
-			ItemCarrinho novoItem = new ItemCarrinho();
-			novoItem.setCarrinho(carrinho);
-			novoItem.setProduto(produto);
-			novoItem.setQuantidade(quantidade);
-			novoItem.setPreco(produto.getPreco() * quantidade);
+    @Override
+    @Transactional
+    public RespostaCarrinhoDTO alterarQuantidade(Long itemId, AlterarQuantidadeCarrinhoItemDTO dto) {
 
-			carrinho.adicionarItem(novoItem);
-			itemCarrinhoRepository.save(novoItem);
-		}
-	}
+        if (dto.quantidade() == null || dto.quantidade() < 1) {
+            throw new RuntimeException(("Quantidade mínima permitida é 1."));
+        }
 
-	private Map<String, String> formatarIngredientes(Map<String, String> ingredientesPorCategoria) {
-		if (ingredientesPorCategoria == null || ingredientesPorCategoria.isEmpty())
-			return null;
+        Long usuarioId = authenticatedUser.getId();
 
-		Map<String, String> ingredientesFormatados = new HashMap<>();
+        Carrinho carrinho = carrinhoRepository.findByUsuarioId(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Carrinho não encontrado."));
 
-		for (CategoriaIngrediente categoria : CategoriaIngrediente.values()) {
-			String categoriaNome = categoria.name().toLowerCase();
-			String ingredientesCategoria = ingredientesPorCategoria.get(categoriaNome);
+        CarrinhoItem item = carrinho.getItens().stream().filter(i -> i.getId().equals(itemId))
+                .findFirst().orElseThrow(() -> new RuntimeException("Item não encontrado no carrinho."));
 
-			if (ingredientesCategoria == null || ingredientesCategoria.isEmpty()) {
-				ingredientesCategoria = "Sem complementos";
-			}
+        if (item.getProduto().getTipo().isMarmita()) {
+            throw new RuntimeException("Não é permitido alterar a quantidade de marmitas.");
+        }
 
-			ingredientesFormatados.put(categoriaNome, ingredientesCategoria);
-		}
+        item.setQuantidade(dto.quantidade());
+        carrinhoRepository.save(carrinho);
 
-		return ingredientesFormatados;
-	}
+        RespostaTotaisCarrinhoDTO totais = carrinhoRepository.calcularTotais(carrinho.getId());
+        return mapCarrinhoToDTO(carrinho, totais);
+    }
 
+    @Override
+    @Transactional
+    public void removerItem(Long itemId) {
+        Long usuarioId = authenticatedUser.getId();
+
+        Carrinho carrinho = carrinhoRepository.findByUsuarioId(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Carrinho não encontrado."));
+
+        CarrinhoItem item = carrinho.getItens().stream().filter(i -> i.getId().equals(itemId))
+                .findFirst().orElseThrow(() -> new RuntimeException("Item não encontrado no carrinho."));
+
+        carrinho.getItens().remove(item);
+
+        carrinhoRepository.save(carrinho);
+    }
+
+    @Override
+    @Transactional
+    public void limparCarrinho() {
+        Long usuarioId = authenticatedUser.getId();
+
+        Carrinho carrinho = carrinhoRepository.findByUsuarioId(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Carrinho não encotrado."));
+
+        carrinho.getItens().clear();
+
+        carrinhoRepository.save(carrinho);
+    }
+
+    // Metodos Privados
+
+    private Carrinho criarCarrinho(Long usuarioId) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+
+        Carrinho carrinho = new Carrinho(usuario, new ArrayList<>());
+
+        return carrinhoRepository.save(carrinho);
+    }
+
+    private RegraProduto obterRegra(Produto produto) {
+        return switch (produto.getTipo()) {
+            case BEBIDA -> new RegraBebida();
+            case MARMITA_PEQUENA, MARMITA_GRANDE -> new RegraMarmita();
+            default -> throw new RuntimeException("Tipo de produto não suportado.");
+        };
+    }
+
+    private RespostaCarrinhoDTO mapCarrinhoToDTO(Carrinho carrinho, RespostaTotaisCarrinhoDTO totais) {
+
+        List<RespostaCarrinhoItemDTO> itens = carrinho.getItens().stream()
+                .map(item -> new RespostaCarrinhoItemDTO(
+                        item.getId(),
+                        item.getProduto().getNome(),
+                        item.getProduto().getPrecoUnitario(),
+                        item.getQuantidade(),
+                        item.getObservacao(),
+                        item.getIngredientes().stream()
+                                .map(Ingrediente::getNome)
+                                .collect(Collectors.toSet())
+                ))
+                .toList();
+
+        return new RespostaCarrinhoDTO(
+                carrinho.getId(),
+                carrinho.getUsuario().getId(),
+                itens,
+                totais.getTotalProdutos(),
+                totais.getValorTotal()
+        );
+    }
 }

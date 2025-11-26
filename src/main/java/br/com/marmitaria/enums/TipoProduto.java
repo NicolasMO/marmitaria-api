@@ -6,5 +6,9 @@ import lombok.Getter;
 public enum TipoProduto {
 	MARMITA_PEQUENA,
     MARMITA_GRANDE,
-    BEBIDA
+    BEBIDA;
+
+    public boolean isMarmita() {
+        return this == MARMITA_PEQUENA || this == MARMITA_GRANDE;
+    }
 }
