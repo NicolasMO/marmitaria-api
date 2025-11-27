@@ -44,4 +44,11 @@ public class PedidoItem {
     )
     private Set<Ingrediente> ingredientes;
 
+    public PedidoItem(Pedido pedido, Produto produto, Integer quantidade, String observacao, Set<Ingrediente> ingredientes) {
+        this.pedido = pedido;
+        this.produto = produto;
+        this.quantidade = quantidade;
+        this.observacao = observacao;
+         this.ingredientes = ingredientes;
+    }
 }

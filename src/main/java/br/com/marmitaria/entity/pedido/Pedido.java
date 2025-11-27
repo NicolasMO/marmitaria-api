@@ -1,6 +1,7 @@
 package br.com.marmitaria.entity.pedido;
 
 import br.com.marmitaria.entity.usuario.Usuario;
+import br.com.marmitaria.enums.FormaPagamento;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
@@ -38,9 +39,9 @@ public class Pedido {
     @Column(name = "endereco_entrega", nullable = false, length = 255)
     private String enderecoEntrega;
 
-    @NotBlank
+    @Enumerated(EnumType.STRING)
     @Column(name = "forma_pagamento", nullable = false, length = 50)
-    private String formaPagamento;
+    private FormaPagamento formaPagamento;
 
     @NotBlank
     @Column(nullable = false, length = 50)
@@ -48,4 +49,12 @@ public class Pedido {
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PedidoItem> itens = new ArrayList<>();
+
+    public Pedido(Usuario usuario, String enderecoEntrega, FormaPagamento formaPagamento) {
+        this.usuario = usuario;
+        this.dataPedido = LocalDateTime.now();
+        this.enderecoEntrega = enderecoEntrega;
+        this.formaPagamento = formaPagamento;
+        this.status = "PAGAMENTO NA ENTREGA";
+    }
 }
