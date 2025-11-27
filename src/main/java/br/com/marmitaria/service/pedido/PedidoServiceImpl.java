@@ -10,6 +10,12 @@ import br.com.marmitaria.entity.endereco.Endereco;
 import br.com.marmitaria.entity.ingrediente.Ingrediente;
 import br.com.marmitaria.entity.pedido.Pedido;
 import br.com.marmitaria.entity.pedido.PedidoItem;
+import br.com.marmitaria.exception.carrinho.CarrinhoNaoEncontradoException;
+import br.com.marmitaria.exception.carrinho.CarrinhoVazioException;
+import br.com.marmitaria.exception.endereco.EnderecoNaoEncontradoException;
+import br.com.marmitaria.exception.endereco.EnderecoSemPermissaoException;
+import br.com.marmitaria.exception.pedido.PedidoNaoEncontradoException;
+import br.com.marmitaria.exception.pedido.PedidoSemPermissaoException;
 import br.com.marmitaria.repository.carrinho.CarrinhoRepository;
 import br.com.marmitaria.repository.endereco.EnderecoRepository;
 import br.com.marmitaria.repository.pedido.PedidoRepository;
@@ -18,9 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,11 +46,11 @@ public class PedidoServiceImpl implements PedidoService {
     public RespostaPedidoDTO buscarPorId(Long id) {
         Long usuarioId = authenticatedUser.getId();
 
-        Pedido pedido = pedidoRepository.findById(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado."));
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new PedidoNaoEncontradoException(id));
 
         if (!pedido.getUsuario().getId().equals(usuarioId)) {
-            throw new RuntimeException("Você não tem permissão para visualizar este pedido.");
+            throw new PedidoSemPermissaoException();
         }
 
         return mapToDTO(pedido);
@@ -60,17 +63,17 @@ public class PedidoServiceImpl implements PedidoService {
         Long usuarioId = authenticatedUser.getId();
 
         Endereco endereco = enderecoRepository.findById(dto.enderecoId())
-                .orElseThrow(() -> new RuntimeException("Endereço não encontrado."));
+                .orElseThrow(() -> new EnderecoNaoEncontradoException(dto.enderecoId()));
 
         if (!endereco.getUsuario().getId().equals(usuarioId)) {
-            throw new RuntimeException("Você não tem permissão para usar este endereço.");
+            throw new EnderecoSemPermissaoException();
         }
 
         Carrinho carrinho = carrinhoRespository.findByUsuarioId(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Carrinho não encontrado."));
+                .orElseThrow(() -> new CarrinhoNaoEncontradoException());
 
         if (carrinho.getItens().isEmpty()) {
-            throw new RuntimeException("Carrinho vazio.");
+            throw new CarrinhoVazioException();
         }
 
         Pedido pedido = new Pedido(

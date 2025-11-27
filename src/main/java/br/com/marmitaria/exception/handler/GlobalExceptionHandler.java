@@ -1,9 +1,11 @@
 package br.com.marmitaria.exception.handler;
 
 import br.com.marmitaria.dto.erro.RespostaErroAPI;
+import br.com.marmitaria.exception.BusinessException;
 import br.com.marmitaria.exception.RequisicaoVaziaException;
 import br.com.marmitaria.exception.ingrediente.IngredienteJaExistenteException;
 import br.com.marmitaria.exception.ingrediente.IngredienteNaoEncontradoException;
+import br.com.marmitaria.exception.pedido.PedidoNaoEncontradoException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,52 +42,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resposta);
     }
 
-    @ExceptionHandler(RequisicaoVaziaException.class)
-    public ResponseEntity<RespostaErroAPI> handleRequisicaoVazia(
-            RequisicaoVaziaException ex,
-            HttpServletRequest request
-    ) {
-        RespostaErroAPI erro = new RespostaErroAPI(
-                HttpStatus.BAD_REQUEST.value(),
-                ex.getClass().getSimpleName(),
-                ex.getMessage(),
-                List.of(ex.getMessage()),
-                request.getRequestURI()
-        );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
-    }
-
-    @ExceptionHandler(IngredienteNaoEncontradoException.class)
-    public ResponseEntity<RespostaErroAPI> handleNotFound(
-            IngredienteNaoEncontradoException ex,
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<RespostaErroAPI> handleBusinessException(
+            BusinessException ex,
             HttpServletRequest request
     ) {
         RespostaErroAPI resposta = new RespostaErroAPI(
-                HttpStatus.NOT_FOUND.value(),
+                ex.getStatus().value(),
                 ex.getClass().getSimpleName(),
                 ex.getMessage(),
                 List.of(ex.getMessage()),
                 request.getRequestURI()
         );
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
-    }
-
-    @ExceptionHandler(IngredienteJaExistenteException.class)
-    public ResponseEntity<RespostaErroAPI> handleConflict(
-            IngredienteJaExistenteException ex,
-            HttpServletRequest request
-    ) {
-        RespostaErroAPI resposta = new RespostaErroAPI(
-                HttpStatus.CONFLICT.value(),
-                ex.getClass().getSimpleName(),
-                ex.getMessage(),
-                List.of(ex.getMessage()),
-                request.getRequestURI()
-        );
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(resposta);
+        return ResponseEntity.status(ex.getStatus()).body(resposta);
     }
 
 }
