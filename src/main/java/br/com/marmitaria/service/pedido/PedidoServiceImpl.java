@@ -1,83 +1,46 @@
 package br.com.marmitaria.service.pedido;
 
-import br.com.marmitaria.config.security.AuthenticatedUser;
-import br.com.marmitaria.dto.item.RespostaItemDTO;
 import br.com.marmitaria.dto.pedido.ConcluirPedidoDTO;
 import br.com.marmitaria.dto.pedido.RespostaPedidoDTO;
 import br.com.marmitaria.entity.carrinho.Carrinho;
-import br.com.marmitaria.entity.carrinho.CarrinhoItem;
 import br.com.marmitaria.entity.endereco.Endereco;
-import br.com.marmitaria.entity.ingrediente.Ingrediente;
 import br.com.marmitaria.entity.pedido.Pedido;
-import br.com.marmitaria.entity.pedido.PedidoItem;
-import br.com.marmitaria.exception.pedido.PedidoNaoEncontradoException;
-import br.com.marmitaria.exception.pedido.PedidoSemPermissaoException;
-import br.com.marmitaria.repository.carrinho.CarrinhoRepository;
-import br.com.marmitaria.repository.pedido.PedidoRepository;
-import br.com.marmitaria.service.pedido.factory.PedidoFactory;
-import br.com.marmitaria.service.pedido.mapper.PedidoMapper;
-import br.com.marmitaria.service.pedido.validator.CarrinhoValidator;
-import br.com.marmitaria.service.pedido.validator.EnderecoValidator;
-import br.com.marmitaria.service.pedido.validator.PedidoValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
+@RequiredArgsConstructor
 public class PedidoServiceImpl implements PedidoService {
 
-    @Autowired
-    AuthenticatedUser authenticatedUser;
-
-    @Autowired
-    CarrinhoRepository carrinhoRepository;
-
-    @Autowired
-    PedidoRepository pedidoRepository;
-
-    @Autowired
-    EnderecoValidator enderecoValidator;
-
-    @Autowired
-    CarrinhoValidator carrinhoValidator;
-
-    @Autowired
-    PedidoValidator pedidoValidator;
-
-    @Autowired
-    PedidoFactory pedidoFactory;
-
-    @Autowired
-    PedidoMapper pedidoMapper;
+    private final PedidoContext contexto;
 
     @Override
     public RespostaPedidoDTO buscarPorId(Long id) {
-        Long usuarioId = authenticatedUser.getId();
+        Long usuarioId = getUsuarioIdAutenticado();
 
-        Pedido pedido = pedidoValidator.validar(id, usuarioId);
+        Pedido pedido = contexto.pedidoValidator.validar(id, usuarioId);
 
-        return pedidoMapper.paraDTO(pedido);
+        return contexto.pedidoMapper.paraDTO(pedido);
     }
 
     @Override
     @Transactional
     public RespostaPedidoDTO concluirPedido(ConcluirPedidoDTO dto) {
+        Long usuarioId = getUsuarioIdAutenticado();
 
-        Long usuarioId = authenticatedUser.getId();
+        Endereco endereco = contexto.enderecoValidator.validar(dto.enderecoId(), usuarioId);
+        Carrinho carrinho = contexto.carrinhoValidator.validar(usuarioId);
+        Pedido pedido = contexto.pedidoFactory.criarPedido(carrinho, endereco, dto.formaPagamento());
 
-        Endereco endereco = enderecoValidator.validar(dto.enderecoId(), usuarioId);
+        contexto.pedidoRepository.save(pedido);
+        contexto.carrinhoService.removerCarrinho(carrinho);
 
-        Carrinho carrinho = carrinhoValidator.validar(usuarioId);
+        return contexto.pedidoMapper.paraDTO(pedido);
+    }
 
-        Pedido pedido = pedidoFactory.criarPedido(carrinho, endereco, dto.formaPagamento());
-
-        pedidoRepository.save(pedido);
-        carrinhoRepository.delete(carrinho);
-
-        return pedidoMapper.paraDTO(pedido);
+    private Long getUsuarioIdAutenticado() {
+        Long usuarioId = contexto.authenticatedUser.getId();
+        return usuarioId;
     }
 }

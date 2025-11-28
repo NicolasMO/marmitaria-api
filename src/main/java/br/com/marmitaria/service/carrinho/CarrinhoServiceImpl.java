@@ -9,6 +9,7 @@ import br.com.marmitaria.entity.ingrediente.Ingrediente;
 import br.com.marmitaria.entity.produto.Produto;
 import br.com.marmitaria.entity.usuario.Usuario;
 import br.com.marmitaria.enums.TipoProduto;
+import br.com.marmitaria.exception.carrinho.CarrinhoNaoEncontradoException;
 import br.com.marmitaria.repository.carrinho.CarrinhoRepository;
 import br.com.marmitaria.repository.ingrediente.IngredienteRepository;
 import br.com.marmitaria.repository.produto.ProdutoRepository;
@@ -157,6 +158,21 @@ public class CarrinhoServiceImpl implements CarrinhoService {
         carrinho.getItens().clear();
 
         carrinhoRepository.save(carrinho);
+    }
+
+    @Override
+    @Transactional
+    public void removerCarrinho(Carrinho carrinho) {
+        Long usuarioId = authenticatedUser.getId();
+
+        Carrinho carrinhoEncontrado = carrinhoRepository.findById(carrinho.getId())
+                .orElseThrow(() -> new CarrinhoNaoEncontradoException());
+
+        if(!carrinhoEncontrado.getUsuario().getId().equals(usuarioId)) {
+            throw new RuntimeException("Você não tem permissão para remover este carrinho");
+        }
+
+        carrinhoRepository.delete(carrinhoEncontrado);
     }
 
     // Metodos Privados
