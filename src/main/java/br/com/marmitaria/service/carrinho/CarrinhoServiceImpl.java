@@ -2,12 +2,14 @@ package br.com.marmitaria.service.carrinho;
 
 import br.com.marmitaria.config.security.AuthenticatedUser;
 import br.com.marmitaria.dto.carrinho.*;
+import br.com.marmitaria.dto.item.RespostaItemDTO;
 import br.com.marmitaria.entity.carrinho.Carrinho;
 import br.com.marmitaria.entity.carrinho.CarrinhoItem;
 import br.com.marmitaria.entity.ingrediente.Ingrediente;
 import br.com.marmitaria.entity.produto.Produto;
 import br.com.marmitaria.entity.usuario.Usuario;
 import br.com.marmitaria.enums.TipoProduto;
+import br.com.marmitaria.exception.carrinho.CarrinhoNaoEncontradoException;
 import br.com.marmitaria.repository.carrinho.CarrinhoRepository;
 import br.com.marmitaria.repository.ingrediente.IngredienteRepository;
 import br.com.marmitaria.repository.produto.ProdutoRepository;
@@ -158,6 +160,21 @@ public class CarrinhoServiceImpl implements CarrinhoService {
         carrinhoRepository.save(carrinho);
     }
 
+    @Override
+    @Transactional
+    public void removerCarrinho(Carrinho carrinho) {
+        Long usuarioId = authenticatedUser.getId();
+
+        Carrinho carrinhoEncontrado = carrinhoRepository.findById(carrinho.getId())
+                .orElseThrow(() -> new CarrinhoNaoEncontradoException());
+
+        if(!carrinhoEncontrado.getUsuario().getId().equals(usuarioId)) {
+            throw new RuntimeException("Você não tem permissão para remover este carrinho");
+        }
+
+        carrinhoRepository.delete(carrinhoEncontrado);
+    }
+
     // Metodos Privados
 
     private Carrinho criarCarrinho(Long usuarioId) {
@@ -179,8 +196,8 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 
     private RespostaCarrinhoDTO mapCarrinhoToDTO(Carrinho carrinho, RespostaTotaisCarrinhoDTO totais) {
 
-        List<RespostaCarrinhoItemDTO> itens = carrinho.getItens().stream()
-                .map(item -> new RespostaCarrinhoItemDTO(
+        List<RespostaItemDTO> itens = carrinho.getItens().stream()
+                .map(item -> new RespostaItemDTO(
                         item.getId(),
                         item.getProduto().getNome(),
                         item.getProduto().getPrecoUnitario(),
