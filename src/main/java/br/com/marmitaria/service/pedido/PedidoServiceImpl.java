@@ -10,15 +10,15 @@ import br.com.marmitaria.entity.endereco.Endereco;
 import br.com.marmitaria.entity.ingrediente.Ingrediente;
 import br.com.marmitaria.entity.pedido.Pedido;
 import br.com.marmitaria.entity.pedido.PedidoItem;
-import br.com.marmitaria.exception.carrinho.CarrinhoNaoEncontradoException;
-import br.com.marmitaria.exception.carrinho.CarrinhoVazioException;
-import br.com.marmitaria.exception.endereco.EnderecoNaoEncontradoException;
-import br.com.marmitaria.exception.endereco.EnderecoSemPermissaoException;
 import br.com.marmitaria.exception.pedido.PedidoNaoEncontradoException;
 import br.com.marmitaria.exception.pedido.PedidoSemPermissaoException;
 import br.com.marmitaria.repository.carrinho.CarrinhoRepository;
-import br.com.marmitaria.repository.endereco.EnderecoRepository;
 import br.com.marmitaria.repository.pedido.PedidoRepository;
+import br.com.marmitaria.service.pedido.factory.PedidoFactory;
+import br.com.marmitaria.service.pedido.mapper.PedidoMapper;
+import br.com.marmitaria.service.pedido.validator.CarrinhoValidator;
+import br.com.marmitaria.service.pedido.validator.EnderecoValidator;
+import br.com.marmitaria.service.pedido.validator.PedidoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,26 +34,33 @@ public class PedidoServiceImpl implements PedidoService {
     AuthenticatedUser authenticatedUser;
 
     @Autowired
-    CarrinhoRepository carrinhoRespository;
+    CarrinhoRepository carrinhoRepository;
 
     @Autowired
     PedidoRepository pedidoRepository;
 
     @Autowired
-    EnderecoRepository enderecoRepository;
+    EnderecoValidator enderecoValidator;
+
+    @Autowired
+    CarrinhoValidator carrinhoValidator;
+
+    @Autowired
+    PedidoValidator pedidoValidator;
+
+    @Autowired
+    PedidoFactory pedidoFactory;
+
+    @Autowired
+    PedidoMapper pedidoMapper;
 
     @Override
     public RespostaPedidoDTO buscarPorId(Long id) {
         Long usuarioId = authenticatedUser.getId();
 
-        Pedido pedido = pedidoRepository.findById(id)
-                .orElseThrow(() -> new PedidoNaoEncontradoException(id));
+        Pedido pedido = pedidoValidator.validar(id, usuarioId);
 
-        if (!pedido.getUsuario().getId().equals(usuarioId)) {
-            throw new PedidoSemPermissaoException();
-        }
-
-        return mapToDTO(pedido);
+        return pedidoMapper.paraDTO(pedido);
     }
 
     @Override
@@ -62,69 +69,15 @@ public class PedidoServiceImpl implements PedidoService {
 
         Long usuarioId = authenticatedUser.getId();
 
-        Endereco endereco = enderecoRepository.findById(dto.enderecoId())
-                .orElseThrow(() -> new EnderecoNaoEncontradoException(dto.enderecoId()));
+        Endereco endereco = enderecoValidator.validar(dto.enderecoId(), usuarioId);
 
-        if (!endereco.getUsuario().getId().equals(usuarioId)) {
-            throw new EnderecoSemPermissaoException();
-        }
+        Carrinho carrinho = carrinhoValidator.validar(usuarioId);
 
-        Carrinho carrinho = carrinhoRespository.findByUsuarioId(usuarioId)
-                .orElseThrow(() -> new CarrinhoNaoEncontradoException());
+        Pedido pedido = pedidoFactory.criarPedido(carrinho, endereco, dto.formaPagamento());
 
-        if (carrinho.getItens().isEmpty()) {
-            throw new CarrinhoVazioException();
-        }
-
-        Pedido pedido = new Pedido(
-                carrinho.getUsuario(),
-                endereco.getLogradouro() + ", " + endereco.getNumero(),
-                dto.formaPagamento()
-                );
-
-        for (CarrinhoItem item : carrinho.getItens()) {
-
-            PedidoItem pedidoItem = new PedidoItem(
-                    pedido,
-                    item.getProduto(),
-                    item.getQuantidade(),
-                    item.getObservacao(),
-                    item.getIngredientes()
-            );
-
-            pedido.getItens().add(pedidoItem);
-        }
-
-        BigDecimal total = carrinhoRespository.calcularTotais(carrinho.getId()).getValorTotal();
-        pedido.setTotal(total);
-
-        carrinhoRespository.delete(carrinho);
         pedidoRepository.save(pedido);
+        carrinhoRepository.delete(carrinho);
 
-        return mapToDTO(pedido);
-    }
-
-    private RespostaPedidoDTO mapToDTO(Pedido pedido) {
-        List<RespostaItemDTO> itens = pedido.getItens().stream().map(i -> new RespostaItemDTO(
-                i.getId(),
-                i.getProduto().getNome(),
-                i.getProduto().getPrecoUnitario(),
-                i.getQuantidade(),
-                i.getObservacao(),
-                i.getIngredientes().stream()
-                        .map(Ingrediente::getNome)
-                        .collect(Collectors.toSet())
-        )).toList();
-
-        return new RespostaPedidoDTO(
-                pedido.getId(),
-                pedido.getUsuario().getId(),
-                pedido.getTotal(),
-                pedido.getEnderecoEntrega(),
-                pedido.getStatus(),
-                pedido.getFormaPagamento(),
-                itens,
-                pedido.getDataPedido()
-        );
+        return pedidoMapper.paraDTO(pedido);
     }
 }
