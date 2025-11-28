@@ -1,9 +1,9 @@
 package br.com.marmitaria.service.pedido;
 
 import br.com.marmitaria.config.security.AuthenticatedUser;
+import br.com.marmitaria.dto.item.RespostaItemDTO;
 import br.com.marmitaria.dto.pedido.ConcluirPedidoDTO;
 import br.com.marmitaria.dto.pedido.RespostaPedidoDTO;
-import br.com.marmitaria.dto.pedido.RespostaPedidoItemDTO;
 import br.com.marmitaria.entity.carrinho.Carrinho;
 import br.com.marmitaria.entity.carrinho.CarrinhoItem;
 import br.com.marmitaria.entity.endereco.Endereco;
@@ -105,7 +105,7 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     private RespostaPedidoDTO mapToDTO(Pedido pedido) {
-        List<RespostaPedidoItemDTO> itens = pedido.getItens().stream().map(i -> new RespostaPedidoItemDTO(
+        List<RespostaItemDTO> itens = pedido.getItens().stream().map(i -> new RespostaItemDTO(
                 i.getId(),
                 i.getProduto().getNome(),
                 i.getProduto().getPrecoUnitario(),

@@ -2,6 +2,7 @@ package br.com.marmitaria.service.carrinho;
 
 import br.com.marmitaria.config.security.AuthenticatedUser;
 import br.com.marmitaria.dto.carrinho.*;
+import br.com.marmitaria.dto.item.RespostaItemDTO;
 import br.com.marmitaria.entity.carrinho.Carrinho;
 import br.com.marmitaria.entity.carrinho.CarrinhoItem;
 import br.com.marmitaria.entity.ingrediente.Ingrediente;
@@ -179,8 +180,8 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 
     private RespostaCarrinhoDTO mapCarrinhoToDTO(Carrinho carrinho, RespostaTotaisCarrinhoDTO totais) {
 
-        List<RespostaCarrinhoItemDTO> itens = carrinho.getItens().stream()
-                .map(item -> new RespostaCarrinhoItemDTO(
+        List<RespostaItemDTO> itens = carrinho.getItens().stream()
+                .map(item -> new RespostaItemDTO(
                         item.getId(),
                         item.getProduto().getNome(),
                         item.getProduto().getPrecoUnitario(),

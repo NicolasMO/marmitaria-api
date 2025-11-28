@@ -2,7 +2,6 @@ package br.com.marmitaria.controller.pedido;
 
 import br.com.marmitaria.dto.pedido.ConcluirPedidoDTO;
 import br.com.marmitaria.dto.pedido.RespostaPedidoDTO;
-import br.com.marmitaria.dto.pedido.RespostaPedidoItemDTO;
 import br.com.marmitaria.service.pedido.PedidoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

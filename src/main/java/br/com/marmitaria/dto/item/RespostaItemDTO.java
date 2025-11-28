@@ -1,4 +1,4 @@
-package br.com.marmitaria.dto.pedido;
+package br.com.marmitaria.dto.item;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public record RespostaPedidoItemDTO(
+public record RespostaItemDTO(
         Long id,
         String produtoNome,
         BigDecimal precoUnitario,

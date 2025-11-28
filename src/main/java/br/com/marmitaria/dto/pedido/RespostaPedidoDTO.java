@@ -1,5 +1,6 @@
 package br.com.marmitaria.dto.pedido;
 
+import br.com.marmitaria.dto.item.RespostaItemDTO;
 import br.com.marmitaria.enums.FormaPagamento;
 
 import java.math.BigDecimal;
@@ -13,6 +14,6 @@ public record RespostaPedidoDTO(
     String enderecoEntrega,
     String status,
     FormaPagamento formaPagamento,
-    List<RespostaPedidoItemDTO> itens,
+    List<RespostaItemDTO> itens,
     LocalDateTime dataPedido
 ) {}
