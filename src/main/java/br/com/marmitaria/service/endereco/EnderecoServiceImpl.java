@@ -2,8 +2,13 @@ package br.com.marmitaria.service.endereco;
 
 import br.com.marmitaria.config.security.AuthenticatedUser;
 import br.com.marmitaria.dto.endereco.RespostaEnderecoDTO;
+import br.com.marmitaria.exception.endereco.EnderecoJaCadastradoException;
+import br.com.marmitaria.exception.endereco.EnderecoLimiteCadastradoException;
+import br.com.marmitaria.exception.endereco.EnderecoNaoEncontradoException;
+import br.com.marmitaria.exception.usuario.UsuarioNaoEncontradoException;
 import br.com.marmitaria.external.viacep.dto.ViaCepResponse;
 import br.com.marmitaria.external.viacep.service.ViaCepService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,38 +22,29 @@ import br.com.marmitaria.repository.usuario.UsuarioRepository;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class EnderecoServiceImpl implements EnderecoService {
 
-    @Autowired
-    AuthenticatedUser authenticatedUser;
+    public final EnderecoContext contexto;
 
-    @Autowired
-	EnderecoRepository enderecoRepository;
-
-    @Autowired
-	UsuarioRepository usuarioRepository;
-
-    @Autowired
-    ViaCepService viaCepService;
-
-	
 	@Override
 	@Transactional
 	public RespostaEnderecoDTO cadastrarEndereco(CadastroEnderecoDTO dto) {
 
-        Long usuarioId = authenticatedUser.getId();
-		Usuario usuario = usuarioRepository.findById(usuarioId)
-				.orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
-
-        if (enderecoRepository.existsByUsuarioIdAndNumeroAndComplementoIgnoreCase(usuarioId, dto.numero(), dto.complemento())) {
-            throw new RuntimeException("Endereço já cadastrado.");
-        }
+        Long usuarioId = contexto.authenticatedUser.getId();
+		Usuario usuario = contexto.usuarioRepository.findById(usuarioId)
+				.orElseThrow(() -> new UsuarioNaoEncontradoException());
 
         if (usuario.getEnderecos().size() >= 3) {
-            throw new RuntimeException(("Máximo de 3 endereços cadastrados."));
+            throw new EnderecoLimiteCadastradoException();
         }
 
-        ViaCepResponse cepInfo = viaCepService.buscarCep(dto.cep());
+        if (contexto.enderecoRepository.existsByUsuarioIdAndNumeroAndComplementoIgnoreCase(usuarioId, dto.numero(), dto.complemento())) {
+            throw new EnderecoJaCadastradoException();
+        }
+
+
+        ViaCepResponse cepInfo = contexto.viaCepService.buscarCep(dto.cep());
 		
 		Endereco endereco = new Endereco(
 				cepInfo.logradouro(),
@@ -61,7 +57,7 @@ public class EnderecoServiceImpl implements EnderecoService {
                 usuario
 				);
 		
-		enderecoRepository.save(endereco);
+		contexto.enderecoRepository.save(endereco);
 
         return new RespostaEnderecoDTO(
                 endereco.getId(),
@@ -78,9 +74,9 @@ public class EnderecoServiceImpl implements EnderecoService {
     @Override
     public List<RespostaEnderecoDTO> listarEnderecosDoUsuario() {
 
-        Long usuarioId = authenticatedUser.getId();
-        Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+        Long usuarioId = contexto.authenticatedUser.getId();
+        Usuario usuario = contexto.usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException());
 
         return usuario.getEnderecos().stream()
                 .map(e -> new RespostaEnderecoDTO(
@@ -98,12 +94,12 @@ public class EnderecoServiceImpl implements EnderecoService {
     @Override
     public RespostaEnderecoDTO listarEnderecoDoUsuarioPorID(Long id) {
 
-        Long usuarioId = authenticatedUser.getId();
-        Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+        Long usuarioId = contexto.authenticatedUser.getId();
+        Usuario usuario = contexto.usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException());
 
-        Endereco endereco = enderecoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Endereço não encontrado."));
+        Endereco endereco = contexto.enderecoRepository.findById(id)
+                .orElseThrow(() -> new EnderecoNaoEncontradoException(id));
 
         return new RespostaEnderecoDTO(
                 endereco.getId(),
@@ -121,13 +117,13 @@ public class EnderecoServiceImpl implements EnderecoService {
     @Transactional
     public void removerEnderecoDoUsuario(Long id) {
 
-        Long usuarioId = authenticatedUser.getId();
-        Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+        Long usuarioId = contexto.authenticatedUser.getId();
+        Usuario usuario = contexto.usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException());
 
-        Endereco endereco = enderecoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Endereço não encontrado."));
+        Endereco endereco = contexto.enderecoRepository.findById(id)
+                .orElseThrow(() -> new EnderecoNaoEncontradoException(id));
 
-        enderecoRepository.delete(endereco);
+        contexto.enderecoRepository.delete(endereco);
     }
 }
