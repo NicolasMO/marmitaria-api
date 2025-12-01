@@ -1,11 +1,16 @@
-package br.com.marmitaria.service.pedido.validator;
+package br.com.marmitaria.service.endereco.validator;
 
+import br.com.marmitaria.dto.endereco.CadastroEnderecoDTO;
 import br.com.marmitaria.entity.endereco.Endereco;
+import br.com.marmitaria.exception.endereco.EnderecoJaCadastradoException;
+import br.com.marmitaria.exception.endereco.EnderecoLimiteCadastradoException;
 import br.com.marmitaria.exception.endereco.EnderecoNaoEncontradoException;
 import br.com.marmitaria.exception.endereco.EnderecoSemPermissaoException;
 import br.com.marmitaria.repository.endereco.EnderecoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class EnderecoValidator {
@@ -22,5 +27,19 @@ public class EnderecoValidator {
         }
 
         return endereco;
+    }
+
+    public void validarDuplicidade(Long usuarioId, CadastroEnderecoDTO dto) {
+        boolean existe = enderecoRepository.existsByUsuarioIdAndNumeroAndComplementoIgnoreCase(usuarioId, dto.numero(), dto.complemento());
+
+        if (existe) {
+            throw new EnderecoJaCadastradoException();
+        }
+    }
+
+    public void validarQuantidadeMaxima(List<Endereco> enderecos) {
+        if (enderecos.size() >= 3) {
+            throw new EnderecoLimiteCadastradoException();
+        }
     }
 }
