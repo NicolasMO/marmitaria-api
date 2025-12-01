@@ -29,7 +29,7 @@ public class AuthValidator {
         };
     }
 
-    public void verificarSeEmailOuCpfExistem (String email, String cpf) {
+    public void validarSeEmailOuCpfExistem (String email, String cpf) {
         if (usuarioRepository.existsByEmail(email)) {
             throw new AuthEmailJaCadastradoException();
         }

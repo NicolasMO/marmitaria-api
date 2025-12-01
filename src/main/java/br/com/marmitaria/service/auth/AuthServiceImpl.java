@@ -27,7 +27,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public Usuario cadastrarUsuario(CadastroUsuarioDTO dto) {
-        contexto.authValidator.verificarSeEmailOuCpfExistem(dto.email(), dto.cpf());
+        contexto.authValidator.validarSeEmailOuCpfExistem(dto.email(), dto.cpf());
         Usuario usuario = contexto.authFactory.criarUsuario(dto);
 
         return contexto.usuarioRepository.save(usuario);

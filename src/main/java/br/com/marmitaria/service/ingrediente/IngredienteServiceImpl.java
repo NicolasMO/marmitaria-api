@@ -4,79 +4,48 @@ import java.util.List;
 
 import br.com.marmitaria.dto.ingrediente.AtualizarIngredienteDTO;
 import br.com.marmitaria.dto.ingrediente.RespostaIngredienteDTO;
-import br.com.marmitaria.exception.RequisicaoVaziaException;
-import br.com.marmitaria.exception.ingrediente.IngredienteJaExistenteException;
-import br.com.marmitaria.exception.ingrediente.IngredienteNaoEncontradoException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import br.com.marmitaria.dto.ingrediente.CadastroIngredienteDTO;
 import br.com.marmitaria.entity.ingrediente.Ingrediente;
-import br.com.marmitaria.repository.ingrediente.IngredienteRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class IngredienteServiceImpl implements IngredienteService {
 
-    @Autowired
-    private IngredienteRepository ingredienteRepository;
+    private final IngredienteContext contexto;
 
     @Override
     @Transactional
     public Ingrediente cadastrarIngrediente(CadastroIngredienteDTO dto) {
-        if (ingredienteRepository.existsByNomeIgnoreCase(dto.nome())) {
-            throw new IngredienteJaExistenteException(dto.nome());
-        }
-
-        Ingrediente ingrediente = new Ingrediente(
-          dto.nome(),
-          dto.categoria()
-        );
-
-        return ingredienteRepository.save(ingrediente);
+        contexto.ingredienteValidator.validarSeNomeExiste(dto.nome());
+        Ingrediente ingrediente = contexto.ingredienteFactory.criarIngrediente(dto);
+        return contexto.ingredienteRepository.save(ingrediente);
     }
 
     @Override
     public RespostaIngredienteDTO listarIngredientePorId(long id) {
-        Ingrediente ingrediente = ingredienteRepository.findById(id)
-                .orElseThrow(() -> new IngredienteNaoEncontradoException(id));
-
-        return new RespostaIngredienteDTO(
-                ingrediente.getId(),
-                ingrediente.getNome(),
-                ingrediente.getCategoria()
-        );
+        Ingrediente ingrediente = contexto.ingredienteValidator.validar(id);
+        return contexto.ingredienteMapper.paraDTO(ingrediente);
     }
 
 	@Override
 	public List<RespostaIngredienteDTO> listarTodos() {
-		List<Ingrediente> ingredientes = ingredienteRepository.findAll();
-
-		return ingredientes.stream().map(ing -> new RespostaIngredienteDTO(
-                ing.getId(), ing.getNome(), ing.getCategoria()
-        )).toList();
+		List<Ingrediente> ingredientes = contexto.ingredienteRepository.findAll();
+		return contexto.ingredienteMapper.paraListaDTO(ingredientes);
 	}
 
     @Override
     @Transactional
     public RespostaIngredienteDTO atualizarIngrediente(Long id, AtualizarIngredienteDTO dto) {
-        boolean nenhumCampoEnviado =
-                (dto.nome() == null || dto.nome().isBlank()) &&
-                        dto.categoria() == null;
+        contexto.ingredienteValidator.validarRequisicaoVazia(dto);
 
-        if (nenhumCampoEnviado) {
-            throw new RequisicaoVaziaException("Envie ao menos um campo para atualização.");
-        }
-
-        Ingrediente ingrediente = ingredienteRepository.findById(id)
-                .orElseThrow(() -> new IngredienteNaoEncontradoException(id));
+        Ingrediente ingrediente = contexto.ingredienteValidator.validar(id);
 
         if (dto.nome() != null && !dto.nome().isBlank()) {
-            boolean jaExiste = ingredienteRepository.existsByNomeIgnoreCase(dto.nome());
-            if (jaExiste && !ingrediente.getNome().equalsIgnoreCase(dto.nome())) {
-                throw new IngredienteJaExistenteException(dto.nome());
-            }
-
+            contexto.ingredienteValidator.validarSeNomeExiste(dto.nome());
             ingrediente.setNome(dto.nome());
         }
 
@@ -84,21 +53,13 @@ public class IngredienteServiceImpl implements IngredienteService {
             ingrediente.setCategoria(dto.categoria());
         }
 
-        return new RespostaIngredienteDTO(
-                ingrediente.getId(),
-                ingrediente.getNome(),
-                ingrediente.getCategoria()
-        );
+        return contexto.ingredienteMapper.paraDTO(ingrediente);
     }
 
     @Override
     @Transactional
     public void removerIngrediente(Long id) {
-        Ingrediente ingrediente = ingredienteRepository.findById(id)
-                .orElseThrow(() -> new IngredienteNaoEncontradoException(id));
-
-        ingredienteRepository.delete(ingrediente);
+        Ingrediente ingrediente = contexto.ingredienteValidator.validar(id);
+        contexto.ingredienteRepository.delete(ingrediente);
     }
-
-
 }
