@@ -5,6 +5,7 @@ import java.util.List;
 import br.com.marmitaria.config.security.AuthenticatedUser;
 import br.com.marmitaria.dto.endereco.RespostaEnderecoDTO;
 import br.com.marmitaria.dto.usuario.RespostaUsuarioDTO;
+import br.com.marmitaria.exception.usuario.UsuarioNaoEncontradoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -60,7 +61,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         Long usuarioId = authenticatedUser.getId();
 
         Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+                .orElseThrow(() -> new UsuarioNaoEncontradoException());
 
         List<RespostaEnderecoDTO> enderecosDTO = usuario.getEnderecos().stream()
                 .map(end -> new RespostaEnderecoDTO(
@@ -89,7 +90,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public RespostaUsuarioDTO buscarUsuarioPorID(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+                .orElseThrow(() -> new UsuarioNaoEncontradoException());
 
         List<RespostaEnderecoDTO> enderecosDTO = usuario.getEnderecos().stream()
                 .map(end -> new RespostaEnderecoDTO(
@@ -119,7 +120,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Transactional
     public void removerUsuario(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new UsuarioNaoEncontradoException());
 
         usuarioRepository.delete(usuario);
     }
