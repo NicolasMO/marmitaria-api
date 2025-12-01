@@ -1,0 +1,25 @@
+package br.com.marmitaria.service.auth.factory;
+
+import br.com.marmitaria.dto.usuario.CadastroUsuarioDTO;
+import br.com.marmitaria.entity.usuario.Usuario;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+@Component
+public class AuthFactory {
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    public Usuario criarUsuario(CadastroUsuarioDTO dto) {
+        return new Usuario(
+                dto.nome(),
+                dto.email(),
+                dto.cpf(),
+                dto.celular(),
+                passwordEncoder.encode(dto.senha())
+        );
+    }
+
+}

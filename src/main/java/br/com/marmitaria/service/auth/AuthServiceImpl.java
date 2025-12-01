@@ -3,6 +3,10 @@ package br.com.marmitaria.service.auth;
 import br.com.marmitaria.dto.auth.LoginDTO;
 import br.com.marmitaria.dto.auth.TokenDTO;
 import br.com.marmitaria.dto.usuario.CadastroUsuarioDTO;
+import br.com.marmitaria.exception.auth.AuthCPFJaCadastradoException;
+import br.com.marmitaria.exception.auth.AuthDadosInvalidosException;
+import br.com.marmitaria.exception.auth.AuthEmailJaCadastradoException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,28 +17,16 @@ import br.com.marmitaria.repository.usuario.UsuarioRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    @Autowired
-    UsuarioRepository usuarioRepository;
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
-    @Autowired
-    JwtUtil jwtUtil;
+    private final AuthContext contexto;
 
     @Override
     public TokenDTO login(LoginDTO dto) {
-
-        Usuario usuario = usuarioRepository.findByEmail(dto.email())
-                .orElseThrow(() -> new IllegalArgumentException("Email ou senha inválidos."));
-
-        if (!passwordEncoder.matches(dto.senha(), usuario.getPassword())) {
-            throw new IllegalArgumentException("Email ou senha inválidos.");
-        };
-
-        String token = jwtUtil.gerarToken(usuario);
+        Usuario usuario = contexto.authValidator.validarEmail(dto.email());
+        contexto.authValidator.validarSenha(dto.senha(), usuario.getPassword());
+        String token = contexto.jwtUtil.gerarToken(usuario);
 
         return new TokenDTO(token);
     }
@@ -42,22 +34,9 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public Usuario cadastrarUsuario(CadastroUsuarioDTO dto) {
-        if (usuarioRepository.existsByEmail(dto.email())) {
-            throw new IllegalArgumentException("E-mail já cadastrado.");
-        }
+        contexto.authValidator.verificarSeEmailOuCpfExistem(dto.email(), dto.cpf());
+        Usuario usuario = contexto.authFactory.criarUsuario(dto);
 
-        if (usuarioRepository.existsByCpf(dto.cpf())) {
-            throw new IllegalArgumentException(("CPF já cadastrado."));
-        }
-
-        Usuario usuario = new Usuario(
-                dto.nome(),
-                dto.email(),
-                dto.cpf(),
-                dto.celular(),
-                passwordEncoder.encode(dto.senha())
-        );
-
-        return usuarioRepository.save(usuario);
+        return contexto.usuarioRepository.save(usuario);
     }
 }
