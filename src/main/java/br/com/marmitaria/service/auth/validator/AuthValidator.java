@@ -1,0 +1,42 @@
+package br.com.marmitaria.service.auth.validator;
+
+import br.com.marmitaria.entity.usuario.Usuario;
+import br.com.marmitaria.exception.auth.AuthCPFJaCadastradoException;
+import br.com.marmitaria.exception.auth.AuthDadosInvalidosException;
+import br.com.marmitaria.exception.auth.AuthEmailJaCadastradoException;
+import br.com.marmitaria.repository.usuario.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+@Component
+public class AuthValidator {
+
+    @Autowired
+    UsuarioRepository usuarioRepository;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    public Usuario validarEmail(String email) {
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new AuthDadosInvalidosException());
+    }
+
+    public void validarSenha(String senhaDTO, String senhaCodificada) {
+        if (!passwordEncoder.matches(senhaDTO, senhaCodificada)) {
+            throw new AuthDadosInvalidosException();
+        };
+    }
+
+    public void verificarSeEmailOuCpfExistem (String email, String cpf) {
+        if (usuarioRepository.existsByEmail(email)) {
+            throw new AuthEmailJaCadastradoException();
+        }
+
+        if (usuarioRepository.existsByCpf(cpf)) {
+            throw new AuthCPFJaCadastradoException();
+        }
+    }
+
+}
