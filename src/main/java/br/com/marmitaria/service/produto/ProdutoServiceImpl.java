@@ -4,76 +4,46 @@ import br.com.marmitaria.dto.produto.AtualizarProdutoDTO;
 import br.com.marmitaria.dto.produto.CadastroProdutoDTO;
 import br.com.marmitaria.dto.produto.RespostaProdutoDTO;
 import br.com.marmitaria.entity.produto.Produto;
-import br.com.marmitaria.repository.produto.ProdutoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ProdutoServiceImpl implements ProdutoService {
 
-    @Autowired
-    ProdutoRepository produtoRepository;
+    private final ProdutoContext contexto;
 
     @Override
     @Transactional
     public Produto cadastrarProduto(CadastroProdutoDTO dto) {
-        if (produtoRepository.existsByNomeIgnoreCase(dto.nome())) {
-            throw new IllegalArgumentException("Já existe um produto com este nome.");
-        }
-
-        Produto produto = new Produto(
-                dto.nome(),
-                dto.precoUnitario(),
-                dto.tipo()
-        );
-
-        return produtoRepository.save(produto);
+        contexto.produtoValidator.validarSeNomeExiste(dto.nome());
+        Produto produto = contexto.produtoFactory.criarProduto(dto);
+        return contexto.produtoRepository.save(produto);
     }
 
     @Override
     public List<RespostaProdutoDTO> listarTodos() {
-        List<Produto> produtos = produtoRepository.findAll();
-
-        return produtos.stream().map(prod -> new RespostaProdutoDTO(
-                prod.getId(),
-                prod.getNome(),
-                prod.getPrecoUnitario(),
-                prod.getImagem(),
-                prod.getTipo()
-        )).toList();
+        List<Produto> produtos = contexto.produtoRepository.findAll();
+        return contexto.produtoMapper.paraListaDTO(produtos);
     }
 
     @Override
     @Transactional
     public RespostaProdutoDTO atualizarProduto(Long id, AtualizarProdutoDTO dto) {
-        if (produtoRepository.existsByNomeIgnoreCase(dto.nome())) {
-            throw new IllegalArgumentException("Já existe um produto com este nome.");
-        }
-
-        Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
-
+        contexto.produtoValidator.validarSeNomeExiste(dto.nome());
+        Produto produto = contexto.produtoValidator.validar(id);
         produto.atualizarDados(dto.nome(), dto.precoUnitario());
-        produtoRepository.save(produto);
-
-        return new RespostaProdutoDTO(
-                produto.getId(),
-                produto.getNome(),
-                produto.getPrecoUnitario(),
-                produto.getImagem(),
-                produto.getTipo()
-        );
+        contexto.produtoRepository.save(produto);
+        return contexto.produtoMapper.paraDTO(produto);
     }
 
     @Override
     @Transactional
     public void removerProduto(Long id) {
-        Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
-
-        produtoRepository.delete(produto);
+        Produto produto = contexto.produtoValidator.validar(id);
+        contexto.produtoRepository.delete(produto);
     }
 }
