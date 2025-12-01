@@ -6,6 +6,7 @@ import br.com.marmitaria.config.security.AuthenticatedUser;
 import br.com.marmitaria.dto.endereco.RespostaEnderecoDTO;
 import br.com.marmitaria.dto.usuario.RespostaUsuarioDTO;
 import br.com.marmitaria.exception.usuario.UsuarioNaoEncontradoException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,113 +16,34 @@ import br.com.marmitaria.entity.usuario.Usuario;
 import br.com.marmitaria.repository.usuario.UsuarioRepository;
 
 @Service
+@RequiredArgsConstructor
 public class UsuarioServiceImpl implements UsuarioService {
 
-    @Autowired
-	UsuarioRepository usuarioRepository;
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
-    @Autowired
-    AuthenticatedUser authenticatedUser;
+    private final UsuarioContext contexto;
 
 	@Override
 	public List<RespostaUsuarioDTO> listarTodos() {
-
-        List<Usuario> usuarios = usuarioRepository.findAll();
-
-        return usuarios.stream().map(usuario -> {
-            List<RespostaEnderecoDTO> enderecosDTO = usuario.getEnderecos().stream()
-                    .map(end -> new RespostaEnderecoDTO(
-                            end.getId(),
-                            end.getLogradouro(),
-                            end.getNumero(),
-                            end.getBairro(),
-                            end.getCidade(),
-                            end.getEstado(),
-                            end.getComplemento(),
-                            end.getCep()
-                    ))
-                    .toList();
-
-            return new RespostaUsuarioDTO(
-                    usuario.getId(),
-                    usuario.getNome(),
-                    usuario.getEmail(),
-                    usuario.getCelular(),
-                    usuario.getCpf(),
-                    enderecosDTO
-            );
-        }).toList();
+        List<Usuario> usuarios = contexto.usuarioRepository.findAll();
+        return contexto.usuarioMapper.paraListaDTO(usuarios);
 	}
 	
 	@Override
 	public RespostaUsuarioDTO buscarUsuario() {
-        Long usuarioId = authenticatedUser.getId();
-
-        Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new UsuarioNaoEncontradoException());
-
-        List<RespostaEnderecoDTO> enderecosDTO = usuario.getEnderecos().stream()
-                .map(end -> new RespostaEnderecoDTO(
-                        end.getId(),
-                        end.getLogradouro(),
-                        end.getNumero(),
-                        end.getBairro(),
-                        end.getCidade(),
-                        end.getEstado(),
-                        end.getComplemento(),
-                        end.getCep()
-                ))
-                .toList();
-
-        return new RespostaUsuarioDTO(
-                usuario.getId(),
-                usuario.getNome(),
-                usuario.getEmail(),
-                usuario.getCelular(),
-                usuario.getCpf(),
-                enderecosDTO
-        );
-
+        Long usuarioId = contexto.authenticatedUser.getId();
+        Usuario usuario = contexto.usuarioValidator.validar(usuarioId);
+        return contexto.usuarioMapper.paraDTO(usuario);
 	}
 
     @Override
     public RespostaUsuarioDTO buscarUsuarioPorID(Long id) {
-        Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new UsuarioNaoEncontradoException());
-
-        List<RespostaEnderecoDTO> enderecosDTO = usuario.getEnderecos().stream()
-                .map(end -> new RespostaEnderecoDTO(
-                        end.getId(),
-                        end.getLogradouro(),
-                        end.getNumero(),
-                        end.getBairro(),
-                        end.getCidade(),
-                        end.getEstado(),
-                        end.getComplemento(),
-                        end.getCep()
-                ))
-                .toList();
-
-        return new RespostaUsuarioDTO(
-                usuario.getId(),
-                usuario.getNome(),
-                usuario.getEmail(),
-                usuario.getCelular(),
-                usuario.getCpf(),
-                enderecosDTO
-        );
-
+        Usuario usuario = contexto.usuarioValidator.validar(id);
+        return contexto.usuarioMapper.paraDTO(usuario);
     }
 
     @Override
     @Transactional
     public void removerUsuario(Long id) {
-        Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new UsuarioNaoEncontradoException());
-
-        usuarioRepository.delete(usuario);
+        Usuario usuario = contexto.usuarioValidator.validar(id);
+        contexto.usuarioRepository.delete(usuario);
     }
 }
