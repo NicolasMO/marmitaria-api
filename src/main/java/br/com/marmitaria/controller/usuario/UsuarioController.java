@@ -56,7 +56,7 @@ public class UsuarioController {
 
     @GetMapping("/me/endereco/{id}")
     public ResponseEntity<RespostaEnderecoDTO> listarEnderecoDoUsuarioPorID(@PathVariable Long id) {
-        RespostaEnderecoDTO endereco = enderecoService.listarEnderecoDoUsuarioPorID(id);
+        RespostaEnderecoDTO endereco = enderecoService.listarEnderecoPorID(id);
         return ResponseEntity.status(HttpStatus.OK).body(endereco);
     }
 

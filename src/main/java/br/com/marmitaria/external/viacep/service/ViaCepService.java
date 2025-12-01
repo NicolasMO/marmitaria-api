@@ -1,6 +1,6 @@
 package br.com.marmitaria.external.viacep.service;
 
-import br.com.marmitaria.external.viacep.dto.ViaCepResponse;
+import br.com.marmitaria.external.viacep.dto.RespostaViaCep;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -9,10 +9,10 @@ public class ViaCepService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public ViaCepResponse buscarCep(String cep) {
+    public RespostaViaCep buscarCep(String cep) {
         String url = "https://viacep.com.br/ws/" + cep + "/json/";
 
-        ViaCepResponse response = restTemplate.getForObject(url, ViaCepResponse.class);
+        RespostaViaCep response = restTemplate.getForObject(url, RespostaViaCep.class);
 
         if (response == null || response.logradouro() == null) {
             throw new IllegalArgumentException("CEP inválido ou não encontrado.");

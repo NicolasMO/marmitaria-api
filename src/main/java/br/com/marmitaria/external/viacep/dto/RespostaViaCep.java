@@ -2,7 +2,7 @@ package br.com.marmitaria.external.viacep.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record ViaCepResponse(
+public record RespostaViaCep(
         String cep,
         String logradouro,
         String bairro,

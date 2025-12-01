@@ -8,6 +8,6 @@ import java.util.List;
 public interface EnderecoService {
 	RespostaEnderecoDTO cadastrarEndereco(CadastroEnderecoDTO dto);
     List<RespostaEnderecoDTO> listarEnderecosDoUsuario();
-    RespostaEnderecoDTO listarEnderecoDoUsuarioPorID(Long id);
+    RespostaEnderecoDTO listarEnderecoPorID(Long id);
     void removerEnderecoDoUsuario(Long id);
 }
