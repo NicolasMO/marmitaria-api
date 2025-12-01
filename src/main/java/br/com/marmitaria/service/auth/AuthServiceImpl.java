@@ -3,17 +3,10 @@ package br.com.marmitaria.service.auth;
 import br.com.marmitaria.dto.auth.LoginDTO;
 import br.com.marmitaria.dto.auth.TokenDTO;
 import br.com.marmitaria.dto.usuario.CadastroUsuarioDTO;
-import br.com.marmitaria.exception.auth.AuthCPFJaCadastradoException;
-import br.com.marmitaria.exception.auth.AuthDadosInvalidosException;
-import br.com.marmitaria.exception.auth.AuthEmailJaCadastradoException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import br.com.marmitaria.config.security.JwtUtil;
 import br.com.marmitaria.entity.usuario.Usuario;
-import br.com.marmitaria.repository.usuario.UsuarioRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
