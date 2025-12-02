@@ -19,7 +19,7 @@ public class AuthValidator {
 
     public Usuario validarEmail(String email) {
         return usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new AuthDadosInvalidosException());
+                .orElseThrow(AuthDadosInvalidosException::new);
     }
 
     public void validarSenha(String senhaDTO, String senhaCodificada) {
