@@ -4,16 +4,18 @@ import br.com.marmitaria.config.security.AuthenticatedUser;
 import br.com.marmitaria.repository.usuario.UsuarioRepository;
 import br.com.marmitaria.service.usuario.mapper.UsuarioMapper;
 import br.com.marmitaria.service.usuario.validator.UsuarioValidator;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Getter
 public class UsuarioContext {
 
-    public final AuthenticatedUser authenticatedUser;
-    public final UsuarioRepository usuarioRepository;
-    public final UsuarioMapper usuarioMapper;
-    public final UsuarioValidator usuarioValidator;
+    private final AuthenticatedUser authenticatedUser;
+    private final UsuarioRepository usuarioRepository;
+    private final UsuarioMapper usuarioMapper;
+    private final UsuarioValidator usuarioValidator;
 
 }

@@ -6,11 +6,13 @@ import br.com.marmitaria.service.carrinho.factory.CarrinhoFactory;
 import br.com.marmitaria.service.carrinho.mapper.CarrinhoMapper;
 import br.com.marmitaria.service.carrinho.validator.CarrinhoValidator;
 import br.com.marmitaria.service.produto.validator.ProdutoValidator;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Getter
 public class CarrinhoContext {
 
     private final CarrinhoRepository carrinhoRepository;
@@ -19,29 +21,5 @@ public class CarrinhoContext {
     private final CarrinhoValidator carrinhoValidator;
     private final CarrinhoFactory carrinhoFactory;
     private final ProdutoValidator produtoValidator;
-
-    public CarrinhoRepository carrinhoRepository() {
-        return carrinhoRepository;
-    }
-
-    public AuthenticatedUser authenticatedUser() {
-        return authenticatedUser;
-    }
-
-    public CarrinhoMapper carrinhoMapper() {
-        return carrinhoMapper;
-    }
-
-    public CarrinhoValidator carrinhoValidator() {
-        return carrinhoValidator;
-    }
-
-    public CarrinhoFactory carrinhoFactory() {
-        return carrinhoFactory;
-    }
-
-    public ProdutoValidator produtoValidator() {
-        return produtoValidator;
-    }
 
 }

@@ -4,14 +4,14 @@ import br.com.marmitaria.entity.produto.Produto;
 import br.com.marmitaria.exception.produto.ProdutoJaExistenteException;
 import br.com.marmitaria.exception.produto.ProdutoNaoEncontradoException;
 import br.com.marmitaria.repository.produto.ProdutoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class ProdutoValidator {
 
-    @Autowired
-    ProdutoRepository produtoRepository;
+    private final ProdutoRepository produtoRepository;
 
     public void validarSeNomeExiste(String nome) {
         if (produtoRepository.existsByNomeIgnoreCase(nome)) {

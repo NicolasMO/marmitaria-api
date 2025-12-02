@@ -5,18 +5,17 @@ import br.com.marmitaria.exception.auth.AuthCPFJaCadastradoException;
 import br.com.marmitaria.exception.auth.AuthDadosInvalidosException;
 import br.com.marmitaria.exception.auth.AuthEmailJaCadastradoException;
 import br.com.marmitaria.repository.usuario.UsuarioRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class AuthValidator {
 
-    @Autowired
-    UsuarioRepository usuarioRepository;
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public Usuario validarEmail(String email) {
         return usuarioRepository.findByEmail(email)

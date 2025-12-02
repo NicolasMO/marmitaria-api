@@ -21,38 +21,38 @@ public class EnderecoServiceImpl implements EnderecoService {
 	@Override
 	@Transactional
 	public RespostaEnderecoDTO cadastrarEndereco(CadastroEnderecoDTO dto) {
-        Long usuarioId = contexto.authenticatedUser.getId();
-		Usuario usuario = contexto.usuarioValidator.validar(usuarioId);
+        Long usuarioId = contexto.getAuthenticatedUser().getId();
+		Usuario usuario = contexto.getUsuarioValidator().validar(usuarioId);
 
-        contexto.enderecoValidator.validarQuantidadeMaxima(usuario.getEnderecos());
-        contexto.enderecoValidator.validarDuplicidade(usuario.getId(), dto);
+        contexto.getEnderecoValidator().validarQuantidadeMaxima(usuario.getEnderecos());
+        contexto.getEnderecoValidator().validarDuplicidade(usuario.getId(), dto);
 
-        RespostaViaCep cepInfo = contexto.viaCepService.buscarCep(dto.cep());
-		Endereco endereco = contexto.enderecoFactory.criarEndereco(dto, usuario, cepInfo);
+        RespostaViaCep cepInfo = contexto.getViaCepService().buscarCep(dto.cep());
+		Endereco endereco = contexto.getEnderecoFactory().criarEndereco(dto, usuario, cepInfo);
 		
-		contexto.enderecoRepository.save(endereco);
-        return contexto.enderecoMapper.paraDTO(endereco);
+		contexto.getEnderecoRepository().save(endereco);
+        return contexto.getEnderecoMapper().paraDTO(endereco);
 	}
 
     @Override
     public List<RespostaEnderecoDTO> listarEnderecosDoUsuario() {
-        Long usuarioId = contexto.authenticatedUser.getId();
-        Usuario usuario = contexto.usuarioValidator.validar(usuarioId);
-        return contexto.enderecoMapper.paraListaDTO(usuario.getEnderecos());
+        Long usuarioId = contexto.getAuthenticatedUser().getId();
+        Usuario usuario = contexto.getUsuarioValidator().validar(usuarioId);
+        return contexto.getEnderecoMapper().paraListaDTO(usuario.getEnderecos());
     };
 
     @Override
     public RespostaEnderecoDTO listarEnderecoPorID(Long id) {
-        Long usuarioId = contexto.authenticatedUser.getId();
-        Endereco endereco = contexto.enderecoValidator.validar(id, usuarioId);
-        return contexto.enderecoMapper.paraDTO(endereco);
+        Long usuarioId = contexto.getAuthenticatedUser().getId();
+        Endereco endereco = contexto.getEnderecoValidator().validar(id, usuarioId);
+        return contexto.getEnderecoMapper().paraDTO(endereco);
     }
 
     @Override
     @Transactional
     public void removerEnderecoDoUsuario(Long id) {
-        Long usuarioId = contexto.authenticatedUser.getId();
-        Endereco endereco = contexto.enderecoValidator.validar(id, usuarioId);
-        contexto.enderecoRepository.delete(endereco);
+        Long usuarioId = contexto.getAuthenticatedUser().getId();
+        Endereco endereco = contexto.getEnderecoValidator().validar(id, usuarioId);
+        contexto.getEnderecoRepository().delete(endereco);
     }
 }

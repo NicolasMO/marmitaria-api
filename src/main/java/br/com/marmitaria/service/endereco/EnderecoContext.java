@@ -7,19 +7,21 @@ import br.com.marmitaria.service.endereco.factory.EnderecoFactory;
 import br.com.marmitaria.service.endereco.mapper.EnderecoMapper;
 import br.com.marmitaria.service.endereco.validator.EnderecoValidator;
 import br.com.marmitaria.service.usuario.validator.UsuarioValidator;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Getter
 public class EnderecoContext {
 
-    public final AuthenticatedUser authenticatedUser;
-    public final EnderecoRepository enderecoRepository;
-    public final UsuarioValidator usuarioValidator;
-    public final EnderecoValidator enderecoValidator;
-    public final EnderecoFactory enderecoFactory;
-    public final EnderecoMapper enderecoMapper;
-    public final ViaCepService viaCepService;
+    private final AuthenticatedUser authenticatedUser;
+    private final EnderecoRepository enderecoRepository;
+    private final UsuarioValidator usuarioValidator;
+    private final EnderecoValidator enderecoValidator;
+    private final EnderecoFactory enderecoFactory;
+    private final EnderecoMapper enderecoMapper;
+    private final ViaCepService viaCepService;
 
 }

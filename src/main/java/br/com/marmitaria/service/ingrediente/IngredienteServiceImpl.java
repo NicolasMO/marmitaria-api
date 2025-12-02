@@ -20,32 +20,32 @@ public class IngredienteServiceImpl implements IngredienteService {
     @Override
     @Transactional
     public Ingrediente cadastrarIngrediente(CadastroIngredienteDTO dto) {
-        contexto.ingredienteValidator.validarSeNomeExiste(dto.nome());
-        Ingrediente ingrediente = contexto.ingredienteFactory.criarIngrediente(dto);
-        return contexto.ingredienteRepository.save(ingrediente);
+        contexto.getIngredienteValidator().validarSeNomeExiste(dto.nome());
+        Ingrediente ingrediente = contexto.getIngredienteFactory().criarIngrediente(dto);
+        return contexto.getIngredienteRepository().save(ingrediente);
     }
 
     @Override
     public RespostaIngredienteDTO listarIngredientePorId(long id) {
-        Ingrediente ingrediente = contexto.ingredienteValidator.validar(id);
-        return contexto.ingredienteMapper.paraDTO(ingrediente);
+        Ingrediente ingrediente = contexto.getIngredienteValidator().validar(id);
+        return contexto.getIngredienteMapper().paraDTO(ingrediente);
     }
 
 	@Override
 	public List<RespostaIngredienteDTO> listarTodos() {
-		List<Ingrediente> ingredientes = contexto.ingredienteRepository.findAll();
-		return contexto.ingredienteMapper.paraListaDTO(ingredientes);
+		List<Ingrediente> ingredientes = contexto.getIngredienteRepository().findAll();
+		return contexto.getIngredienteMapper().paraListaDTO(ingredientes);
 	}
 
     @Override
     @Transactional
     public RespostaIngredienteDTO atualizarIngrediente(Long id, AtualizarIngredienteDTO dto) {
-        contexto.ingredienteValidator.validarRequisicaoVazia(dto);
+        contexto.getIngredienteValidator().validarRequisicaoVazia(dto);
 
-        Ingrediente ingrediente = contexto.ingredienteValidator.validar(id);
+        Ingrediente ingrediente = contexto.getIngredienteValidator().validar(id);
 
         if (dto.nome() != null && !dto.nome().isBlank()) {
-            contexto.ingredienteValidator.validarSeNomeExiste(dto.nome());
+            contexto.getIngredienteValidator().validarSeNomeExiste(dto.nome());
             ingrediente.setNome(dto.nome());
         }
 
@@ -53,13 +53,13 @@ public class IngredienteServiceImpl implements IngredienteService {
             ingrediente.setCategoria(dto.categoria());
         }
 
-        return contexto.ingredienteMapper.paraDTO(ingrediente);
+        return contexto.getIngredienteMapper().paraDTO(ingrediente);
     }
 
     @Override
     @Transactional
     public void removerIngrediente(Long id) {
-        Ingrediente ingrediente = contexto.ingredienteValidator.validar(id);
-        contexto.ingredienteRepository.delete(ingrediente);
+        Ingrediente ingrediente = contexto.getIngredienteValidator().validar(id);
+        contexto.getIngredienteRepository().delete(ingrediente);
     }
 }
