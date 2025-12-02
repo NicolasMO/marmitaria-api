@@ -1,6 +1,5 @@
 package br.com.marmitaria.dto.produto;
 
-import br.com.marmitaria.enums.TipoProduto;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;

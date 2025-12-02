@@ -1,11 +1,7 @@
 package br.com.marmitaria.service.carrinho;
 
 import br.com.marmitaria.config.security.AuthenticatedUser;
-import br.com.marmitaria.dto.carrinho.RespostaTotaisCarrinhoDTO;
-import br.com.marmitaria.entity.carrinho.Carrinho;
 import br.com.marmitaria.repository.carrinho.CarrinhoRepository;
-import br.com.marmitaria.repository.ingrediente.IngredienteRepository;
-import br.com.marmitaria.repository.usuario.UsuarioRepository;
 import br.com.marmitaria.service.carrinho.factory.CarrinhoFactory;
 import br.com.marmitaria.service.carrinho.mapper.CarrinhoMapper;
 import br.com.marmitaria.service.carrinho.validator.CarrinhoValidator;

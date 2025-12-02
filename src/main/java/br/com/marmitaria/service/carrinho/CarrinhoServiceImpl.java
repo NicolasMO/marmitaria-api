@@ -1,28 +1,16 @@
 package br.com.marmitaria.service.carrinho;
 
 import br.com.marmitaria.dto.carrinho.*;
-import br.com.marmitaria.dto.item.RespostaItemDTO;
 import br.com.marmitaria.entity.carrinho.Carrinho;
 import br.com.marmitaria.entity.carrinho.CarrinhoItem;
 import br.com.marmitaria.entity.ingrediente.Ingrediente;
 import br.com.marmitaria.entity.produto.Produto;
-import br.com.marmitaria.entity.usuario.Usuario;
-import br.com.marmitaria.enums.TipoProduto;
 import br.com.marmitaria.exception.carrinho.*;
-import br.com.marmitaria.exception.ingrediente.IngredienteListaNaoEncontradaException;
-import br.com.marmitaria.exception.produto.ProdutoTipoInvalidoException;
-import br.com.marmitaria.exception.usuario.UsuarioNaoEncontradoException;
-import br.com.marmitaria.service.carrinho.strategy.RegraBebida;
-import br.com.marmitaria.service.carrinho.strategy.RegraMarmita;
-import br.com.marmitaria.service.carrinho.strategy.RegraProduto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

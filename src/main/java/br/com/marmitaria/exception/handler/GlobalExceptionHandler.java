@@ -2,10 +2,6 @@ package br.com.marmitaria.exception.handler;
 
 import br.com.marmitaria.dto.erro.RespostaErroAPI;
 import br.com.marmitaria.exception.BusinessException;
-import br.com.marmitaria.exception.RequisicaoVaziaException;
-import br.com.marmitaria.exception.ingrediente.IngredienteJaExistenteException;
-import br.com.marmitaria.exception.ingrediente.IngredienteNaoEncontradoException;
-import br.com.marmitaria.exception.pedido.PedidoNaoEncontradoException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
