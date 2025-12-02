@@ -32,170 +32,70 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 
     @Override
     public RespostaCarrinhoDTO listarCarrinho() {
-        Long usuarioId = contexto.authenticatedUser.getId();
-        Carrinho carrinho = contexto.carrinhoValidator.validar(usuarioId);
-        RespostaTotaisCarrinhoDTO totais = contexto.carrinhoRepository.calcularTotais(carrinho.getId());
-        return mapCarrinhoToDTO(carrinho, totais);
+        Long usuarioId = contexto.authenticatedUser().getId();
+        Carrinho carrinho = contexto.carrinhoValidator().validarExistente(usuarioId);
+        RespostaTotaisCarrinhoDTO totais = contexto.carrinhoRepository().calcularTotais(carrinho.getId());
+        return contexto.carrinhoMapper().paraDTO(carrinho, totais);
     }
 
     @Override
     @Transactional
     public RespostaCarrinhoDTO adicionarItem(AdicionarCarrinhoItemDTO dto) {
-        Long usuarioId = contexto.authenticatedUser.getId();
+        Long usuarioId = contexto.authenticatedUser().getId();
+        Carrinho carrinho = contexto.carrinhoValidator().obterOuCriar(usuarioId);
+        Produto produto = contexto.produtoValidator().validar(dto.produtoId());
+        List<Ingrediente> ingredientes = contexto.carrinhoValidator().validarIngredientes(dto.ingredientesId());
+        contexto.carrinhoValidator().validarRegrasDoProduto(produto, ingredientes);
+        CarrinhoItem item = contexto.carrinhoFactory().criarItem(carrinho, produto, ingredientes, dto.observacao());
+        boolean duplicada = contexto.carrinhoValidator().tratarBebidaDuplicada(carrinho, item);
 
-        Carrinho carrinho = contexto.carrinhoRepository.findByUsuarioId(usuarioId)
-                .orElseGet(() -> criarCarrinho(usuarioId));
+        if (!duplicada) carrinho.getItens().add(item);
 
-        Produto produto = contexto.produtoValidator.validar(dto.produtoId());
-
-        List<Long> ingredientesId = dto.ingredientesId() != null ? dto.ingredientesId() : List.of();
-        List<Ingrediente> ingredientes = contexto.ingredienteRepository.findAllById(ingredientesId);
-
-        if (ingredientes.size() != ingredientesId.size()) {
-            throw new IngredienteListaNaoEncontradaException();
-        }
-
-        RegraProduto regra = obterRegra(produto);
-        regra.validar(produto, ingredientes);
-
-        if (produto.getTipo() == TipoProduto.BEBIDA) {
-            CarrinhoItem bebidaExistente = carrinho.getItens().stream().filter(item -> item.getProduto().getId().equals(produto.getId()))
-                    .findFirst().orElse(null);
-
-            if (bebidaExistente != null) {
-                bebidaExistente.setQuantidade(bebidaExistente.getQuantidade() + 1);
-                contexto.carrinhoRepository.save(carrinho);
-                RespostaTotaisCarrinhoDTO totais = contexto.carrinhoRepository.calcularTotais(carrinho.getId());
-                return mapCarrinhoToDTO(carrinho, totais);
-            }
-        }
-
-        CarrinhoItem item = new CarrinhoItem(
-                carrinho,
-                produto,
-                1,
-                dto.observacao(),
-                new HashSet<>(ingredientes)
-        );
-
-        carrinho.getItens().add(item);
-        contexto.carrinhoRepository.save(carrinho);
-
-        RespostaTotaisCarrinhoDTO totais = contexto.carrinhoRepository.calcularTotais(carrinho.getId());
-        return mapCarrinhoToDTO(carrinho, totais);
+        contexto.carrinhoRepository().save(carrinho);
+        RespostaTotaisCarrinhoDTO totais = contexto.carrinhoRepository().calcularTotais(carrinho.getId());
+        return contexto.carrinhoMapper().paraDTO(carrinho, totais);
     }
 
     @Override
     @Transactional
     public RespostaCarrinhoDTO alterarQuantidade(Long itemId, AlterarQuantidadeCarrinhoItemDTO dto) {
+        Long usuarioId = contexto.authenticatedUser().getId();
 
-        if (dto.quantidade() == null || dto.quantidade() < 1) {
-            throw new CarrinhoAlterarQuantidadeBebidaException("mínima", 1);
-        }
+        Carrinho carrinho = contexto.carrinhoValidator().validarExistente(usuarioId);
 
-        Long usuarioId = contexto.authenticatedUser.getId();
+        CarrinhoItem item = contexto.carrinhoValidator().validarItem(carrinho, itemId);
 
-        Carrinho carrinho = contexto.carrinhoRepository.findByUsuarioId(usuarioId)
-                .orElseThrow(() -> new CarrinhoNaoEncontradoException());
+        contexto.carrinhoValidator().validarAlteracaoQuantidade(item, dto.quantidade());
 
-        CarrinhoItem item = carrinho.getItens().stream().filter(i -> i.getId().equals(itemId))
-                .findFirst().orElseThrow(() -> new CarrinhoItemNaoEncontradoException());
-
-        if (item.getProduto().getTipo().isMarmita()) {
-            throw new CarrinhoAlterarQuantidadeMarmitaException();
-        }
-
-        item.setQuantidade(dto.quantidade());
-        contexto.carrinhoRepository.save(carrinho);
-
-        RespostaTotaisCarrinhoDTO totais = contexto.carrinhoRepository.calcularTotais(carrinho.getId());
-        return mapCarrinhoToDTO(carrinho, totais);
+        contexto.carrinhoRepository().save(carrinho);
+        RespostaTotaisCarrinhoDTO totais = contexto.carrinhoRepository().calcularTotais(carrinho.getId());
+        return contexto.carrinhoMapper().paraDTO(carrinho, totais);
     }
 
     @Override
     @Transactional
     public void removerItem(Long itemId) {
-        Long usuarioId = contexto.authenticatedUser.getId();
-
-        Carrinho carrinho = contexto.carrinhoRepository.findByUsuarioId(usuarioId)
-                .orElseThrow(() -> new CarrinhoNaoEncontradoException());
-
-        CarrinhoItem item = carrinho.getItens().stream().filter(i -> i.getId().equals(itemId))
-                .findFirst().orElseThrow(() -> new CarrinhoItemNaoEncontradoException());
-
+        Long usuarioId = contexto.authenticatedUser().getId();
+        Carrinho carrinho = contexto.carrinhoValidator().validarExistente(usuarioId);
+        CarrinhoItem item = contexto.carrinhoValidator().validarItem(carrinho, itemId);
         carrinho.getItens().remove(item);
-
-        contexto.carrinhoRepository.save(carrinho);
+        contexto.carrinhoRepository().save(carrinho);
     }
 
     @Override
     @Transactional
     public void limparCarrinho() {
-        Long usuarioId = contexto.authenticatedUser.getId();
-
-        Carrinho carrinho = contexto.carrinhoRepository.findByUsuarioId(usuarioId)
-                .orElseThrow(() -> new CarrinhoNaoEncontradoException());
-
+        Long usuarioId = contexto.authenticatedUser().getId();
+        Carrinho carrinho = contexto.carrinhoValidator().validarExistente(usuarioId);
         carrinho.getItens().clear();
-
-        contexto.carrinhoRepository.save(carrinho);
+        contexto.carrinhoRepository().save(carrinho);
     }
 
     @Override
     @Transactional
     public void removerCarrinho(Carrinho carrinho) {
-        Long usuarioId = contexto.authenticatedUser.getId();
-
-        Carrinho carrinhoEncontrado = contexto.carrinhoRepository.findById(carrinho.getId())
-                .orElseThrow(() -> new CarrinhoNaoEncontradoException());
-
-        if(!carrinhoEncontrado.getUsuario().getId().equals(usuarioId)) {
-            throw new CarrinhoUsuarioSemPermissaoException("Você não tem permissão para remover este carrinho");
-        }
-
-        contexto.carrinhoRepository.delete(carrinhoEncontrado);
-    }
-
-    // Metodos Privados
-
-    private Carrinho criarCarrinho(Long usuarioId) {
-        Usuario usuario = contexto.usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new UsuarioNaoEncontradoException());
-
-        Carrinho carrinho = new Carrinho(usuario, new ArrayList<>());
-
-        return contexto.carrinhoRepository.save(carrinho);
-    }
-
-    private RegraProduto obterRegra(Produto produto) {
-        return switch (produto.getTipo()) {
-            case BEBIDA -> new RegraBebida();
-            case MARMITA_PEQUENA, MARMITA_GRANDE -> new RegraMarmita();
-            default -> throw new ProdutoTipoInvalidoException();
-        };
-    }
-
-    private RespostaCarrinhoDTO mapCarrinhoToDTO(Carrinho carrinho, RespostaTotaisCarrinhoDTO totais) {
-
-        List<RespostaItemDTO> itens = carrinho.getItens().stream()
-                .map(item -> new RespostaItemDTO(
-                        item.getId(),
-                        item.getProduto().getNome(),
-                        item.getProduto().getPrecoUnitario(),
-                        item.getQuantidade(),
-                        item.getObservacao(),
-                        item.getIngredientes().stream()
-                                .map(Ingrediente::getNome)
-                                .collect(Collectors.toSet())
-                ))
-                .toList();
-
-        return new RespostaCarrinhoDTO(
-                carrinho.getId(),
-                carrinho.getUsuario().getId(),
-                itens,
-                totais.getTotalProdutos(),
-                totais.getValorTotal()
-        );
+        Long usuarioId = contexto.authenticatedUser().getId();
+        contexto.carrinhoValidator().validarExclusaoCarrinho(carrinho, usuarioId);
+        contexto.carrinhoRepository().delete(carrinho);
     }
 }

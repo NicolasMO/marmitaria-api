@@ -1,6 +1,8 @@
 package br.com.marmitaria.service.carrinho;
 
 import br.com.marmitaria.config.security.AuthenticatedUser;
+import br.com.marmitaria.dto.carrinho.RespostaTotaisCarrinhoDTO;
+import br.com.marmitaria.entity.carrinho.Carrinho;
 import br.com.marmitaria.repository.carrinho.CarrinhoRepository;
 import br.com.marmitaria.repository.ingrediente.IngredienteRepository;
 import br.com.marmitaria.repository.usuario.UsuarioRepository;
@@ -15,15 +17,35 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CarrinhoContext {
 
-    public final AuthenticatedUser authenticatedUser;
-    public final CarrinhoRepository carrinhoRepository;
-    public final IngredienteRepository ingredienteRepository;
-    public final UsuarioRepository usuarioRepository;
+    private final CarrinhoRepository carrinhoRepository;
+    private final AuthenticatedUser authenticatedUser;
+    private final CarrinhoMapper carrinhoMapper;
+    private final CarrinhoValidator carrinhoValidator;
+    private final CarrinhoFactory carrinhoFactory;
+    private final ProdutoValidator produtoValidator;
 
-    public final CarrinhoMapper carrinhoMapper;
-    public final CarrinhoValidator carrinhoValidator;
-    public final CarrinhoFactory carrinhoFactory;
+    public CarrinhoRepository carrinhoRepository() {
+        return carrinhoRepository;
+    }
 
-    public final ProdutoValidator produtoValidator;
+    public AuthenticatedUser authenticatedUser() {
+        return authenticatedUser;
+    }
+
+    public CarrinhoMapper carrinhoMapper() {
+        return carrinhoMapper;
+    }
+
+    public CarrinhoValidator carrinhoValidator() {
+        return carrinhoValidator;
+    }
+
+    public CarrinhoFactory carrinhoFactory() {
+        return carrinhoFactory;
+    }
+
+    public ProdutoValidator produtoValidator() {
+        return produtoValidator;
+    }
 
 }

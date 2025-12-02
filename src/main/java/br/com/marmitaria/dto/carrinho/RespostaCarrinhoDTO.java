@@ -7,7 +7,7 @@ import java.util.List;
 
 public record RespostaCarrinhoDTO(
         Long id,
-        Long usuarioId,
+        String usuarioNome,
         List<RespostaItemDTO> itens,
         int totalProdutos,
         BigDecimal valorTotal
