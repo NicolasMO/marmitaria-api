@@ -1,4 +1,4 @@
-package br.com.marmitaria.service.pedido.validator;
+package br.com.marmitaria.service.carrinho.validator;
 
 import br.com.marmitaria.entity.carrinho.Carrinho;
 import br.com.marmitaria.exception.carrinho.CarrinhoNaoEncontradoException;
