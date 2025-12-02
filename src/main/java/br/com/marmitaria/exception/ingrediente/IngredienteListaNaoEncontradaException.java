@@ -5,6 +5,6 @@ import org.springframework.http.HttpStatus;
 
 public class IngredienteListaNaoEncontradaException extends BusinessException {
     public IngredienteListaNaoEncontradaException() {
-        super("Um ou mais ingredientes informados não existem ou estão repetidos", HttpStatus.NOT_FOUND);
+        super("Um ou mais ingredientes informados não existem ou estão repetidos", HttpStatus.BAD_REQUEST);
     }
 }

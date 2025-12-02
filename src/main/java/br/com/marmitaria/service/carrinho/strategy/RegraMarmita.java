@@ -4,6 +4,8 @@ import br.com.marmitaria.entity.ingrediente.Ingrediente;
 import br.com.marmitaria.entity.produto.Produto;
 import br.com.marmitaria.enums.CategoriaIngrediente;
 import br.com.marmitaria.enums.RegrasMarmita;
+import br.com.marmitaria.exception.produto.ProdutoComIngredienteException;
+import br.com.marmitaria.exception.produto.ProdutoLimiteIngredienteException;
 
 import java.util.List;
 
@@ -12,7 +14,7 @@ public class RegraMarmita implements RegraProduto {
     @Override
     public void validar(Produto produto, List<Ingrediente> ingredientes) {
         if (ingredientes.isEmpty()) {
-            throw new RuntimeException("Marmitas devem conter ingredientes.");
+            throw new ProdutoComIngredienteException("Marmitas devem conter ingredientes.");
         }
 
         RegrasMarmita regras = RegrasMarmita.of(produto.getTipo());
@@ -24,12 +26,12 @@ public class RegraMarmita implements RegraProduto {
         var limite = regras.limites;
 
         if (proteina < limite.minProteina() || proteina > limite.maxProteina())
-            throw new RuntimeException("Quantidade inválida de proteínas.");
+            throw new ProdutoLimiteIngredienteException("proteínas");
 
         if (carboidrato < limite.minCarboidrato() || carboidrato > limite.maxCarboidrato())
-            throw new RuntimeException("Quantidade inválida de carboidratos.");
+            throw new ProdutoLimiteIngredienteException("carboidratos");
 
         if (complemento < limite.minComplemento() || complemento > limite.maxComplemento())
-            throw new RuntimeException("Quantidade inválida de complementos.");
+            throw new ProdutoLimiteIngredienteException("complementos");
     }
 }
