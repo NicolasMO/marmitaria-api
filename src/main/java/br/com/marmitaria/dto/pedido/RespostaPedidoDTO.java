@@ -9,7 +9,7 @@ import java.util.List;
 
 public record RespostaPedidoDTO(
     Long pedidoId,
-    long usuarioId,
+    String usuarioNome,
     BigDecimal total,
     String enderecoEntrega,
     String status,

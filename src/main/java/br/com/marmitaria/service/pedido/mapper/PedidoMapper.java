@@ -14,7 +14,7 @@ public class PedidoMapper {
     public RespostaPedidoDTO paraDTO(Pedido pedido) {
         return new RespostaPedidoDTO(
                 pedido.getId(),
-                pedido.getUsuario().getId(),
+                pedido.getUsuario().getNome(),
                 pedido.getTotal(),
                 pedido.getEnderecoEntrega(),
                 pedido.getStatus(),
