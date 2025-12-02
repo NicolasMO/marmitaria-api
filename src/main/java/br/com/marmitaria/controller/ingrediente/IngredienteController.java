@@ -7,19 +7,19 @@ import br.com.marmitaria.dto.ingrediente.CadastroIngredienteDTO;
 import br.com.marmitaria.dto.ingrediente.RespostaIngredienteDTO;
 import br.com.marmitaria.service.ingrediente.IngredienteService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import br.com.marmitaria.entity.ingrediente.Ingrediente;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("ingredientes")
 public class IngredienteController {
 
-    @Autowired
-    private IngredienteService ingredienteService;
+    private final IngredienteService ingredienteService;
 
 	@GetMapping
 	public ResponseEntity<List<RespostaIngredienteDTO>> listarIngredientes() {

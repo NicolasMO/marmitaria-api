@@ -6,20 +6,18 @@ import br.com.marmitaria.entity.pedido.Pedido;
 import br.com.marmitaria.entity.pedido.PedidoItem;
 import br.com.marmitaria.enums.FormaPagamento;
 import br.com.marmitaria.repository.carrinho.CarrinhoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class PedidoFactory {
 
-    @Autowired
-    PedidoItemFactory itemFactory;
-
-    @Autowired
-    CarrinhoRepository carrinhoRepository;
+    private final PedidoItemFactory itemFactory;
+    private final CarrinhoRepository carrinhoRepository;
 
     public Pedido criarPedido(Carrinho carrinho, Endereco endereco, FormaPagamento formaPagamento) {
 

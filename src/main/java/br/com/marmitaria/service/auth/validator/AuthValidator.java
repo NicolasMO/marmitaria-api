@@ -6,7 +6,6 @@ import br.com.marmitaria.exception.auth.AuthDadosInvalidosException;
 import br.com.marmitaria.exception.auth.AuthEmailJaCadastradoException;
 import br.com.marmitaria.repository.usuario.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
