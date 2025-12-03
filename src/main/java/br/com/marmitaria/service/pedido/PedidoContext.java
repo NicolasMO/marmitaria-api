@@ -6,7 +6,7 @@ import br.com.marmitaria.service.carrinho.CarrinhoService;
 import br.com.marmitaria.service.endereco.validator.EnderecoValidator;
 import br.com.marmitaria.service.pedido.factory.PedidoFactory;
 import br.com.marmitaria.service.pedido.mapper.PedidoMapper;
-import br.com.marmitaria.service.pedido.validator.CarrinhoValidator;
+import br.com.marmitaria.service.carrinho.validator.CarrinhoValidator;
 import br.com.marmitaria.service.pedido.validator.PedidoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

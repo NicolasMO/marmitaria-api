@@ -30,7 +30,7 @@ public class PedidoServiceImpl implements PedidoService {
         Long usuarioId = getUsuarioIdAutenticado();
 
         Endereco endereco = contexto.enderecoValidator.validar(dto.enderecoId(), usuarioId);
-        Carrinho carrinho = contexto.carrinhoValidator.validar(usuarioId);
+        Carrinho carrinho = contexto.carrinhoValidator.validarExistente(usuarioId);
         Pedido pedido = contexto.pedidoFactory.criarPedido(carrinho, endereco, dto.formaPagamento());
 
         contexto.pedidoRepository.save(pedido);

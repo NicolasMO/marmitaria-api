@@ -15,8 +15,9 @@ public interface CarrinhoRepository extends JpaRepository<Carrinho, Long> {
     Optional<Carrinho> findByUsuarioId(Long usuarioId);
 
     @Query("""
-            SELECT sum(ci.quantidade) as totalProdutos,
-                   sum(ci.quantidade * ci.produto.precoUnitario) as valorTotal
+            SELECT 
+                COALESCE(sum(ci.quantidade), 0) as totalProdutos,
+                COALESCE(sum(ci.quantidade * ci.produto.precoUnitario), 0) as valorTotal
             FROM CarrinhoItem ci
             where ci.carrinho.id = :carrinhoId
             """)
