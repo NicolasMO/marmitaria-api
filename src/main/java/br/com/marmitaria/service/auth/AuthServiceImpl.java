@@ -30,6 +30,13 @@ public class AuthServiceImpl implements AuthService {
         contexto.getAuthValidator().validarSeEmailOuCpfExistem(dto.email(), dto.cpf());
         Usuario usuario = contexto.getAuthFactory().criarUsuario(dto);
 
+        String assunto = "Confirme seu cadastro";
+        String mensagem = "Obrigado por se cadastrar!\n\n" +
+                "Clique no link para confirmar sua conta:\n" +
+                "http://localhost:8080/auth/confirmar?email=" + usuario.getEmail();
+
+        contexto.getEmailService().enviarEmail(usuario.getEmail(), assunto, mensagem);
+
         return contexto.getUsuarioRepository().save(usuario);
     }
 }

@@ -31,6 +31,15 @@ public class JwtUtil {
                 .compact();
     }
 
+    public String gerarTokenAtivacao(Usuario usuario) {
+        return Jwts.builder()
+                .setSubject(usuario.getUsername())
+                .setExpiration(new Date(System.currentTimeMillis() + 900000))
+                .claim("tipo", "ativacao")
+                .signWith(getSigningKey())
+                .compact();
+    }
+
     public String extrairEmail(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())

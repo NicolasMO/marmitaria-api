@@ -2,6 +2,7 @@ package br.com.marmitaria.config.security;
 
 import java.util.ArrayList;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,24 +13,20 @@ import br.com.marmitaria.entity.usuario.Usuario;
 import br.com.marmitaria.repository.usuario.UsuarioRepository;
 
 @Service
+@RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
-	
-	private final UsuarioRepository usuarioRepository;
-	
-	public UserDetailsServiceImpl (UsuarioRepository usuarioRepository) {
-		this.usuarioRepository = usuarioRepository;
-	}
-	
-	 @Override
-	 @Transactional(readOnly = true)
-	 public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-	     Usuario usuario = usuarioRepository.findByEmail(email)
-	             .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+    private final UsuarioRepository usuarioRepository;
 
-	     return new org.springframework.security.core.userdetails.User(
-	             usuario.getUsername(),
-	             usuario.getPassword(),
-	             new ArrayList<>()
-	     );
-	 }
+    @Override
+    @Transactional(readOnly = true)
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+
+        return new org.springframework.security.core.userdetails.User(
+                usuario.getUsername(),
+                usuario.getPassword(),
+                new ArrayList<>()
+        );
+     }
 }
