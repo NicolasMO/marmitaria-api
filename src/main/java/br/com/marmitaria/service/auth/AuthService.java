@@ -8,4 +8,5 @@ import br.com.marmitaria.entity.usuario.Usuario;
 public interface AuthService {
     TokenDTO login(LoginDTO dto);
     Usuario cadastrarUsuario(CadastroUsuarioDTO cadastroUsuarioDTO);
+    String confirmarCadastro(String token);
 }
