@@ -19,6 +19,8 @@ public class AuthServiceImpl implements AuthService {
     public TokenDTO login(LoginDTO dto) {
         Usuario usuario = contexto.getAuthValidator().validarEmail(dto.email());
         contexto.getAuthValidator().validarSenha(dto.senha(), usuario.getPassword());
+        contexto.getAuthValidator().validarSeUsuarioConfirmado(usuario);
+
         String token = contexto.getJwtUtil().gerarToken(usuario);
 
         return new TokenDTO(token);
@@ -38,5 +40,17 @@ public class AuthServiceImpl implements AuthService {
         contexto.getEmailService().enviarEmail(usuario.getEmail(), assunto, mensagem);
 
         return contexto.getUsuarioRepository().save(usuario);
+    }
+
+    @Override
+    @Transactional
+    public String confirmarCadastro(String email) {
+        Usuario usuario = contexto.getAuthValidator().validarEmail(email);
+        if (usuario.isEnabled()) return "Usuário já confirmado.";
+
+        usuario.setAtivo(true);
+        contexto.getUsuarioRepository().save(usuario);
+
+        return "Conta confirmada com sucesso!";
     }
 }

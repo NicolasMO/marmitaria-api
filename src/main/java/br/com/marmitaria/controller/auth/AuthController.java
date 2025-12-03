@@ -8,10 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import br.com.marmitaria.service.auth.AuthService;
 
@@ -26,6 +23,12 @@ public class AuthController {
     public ResponseEntity<Usuario> cadastrarUsuario(@Valid @RequestBody CadastroUsuarioDTO cadastroUsuarioDTO) {
         Usuario criado = authService.cadastrarUsuario(cadastroUsuarioDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(criado);
+    }
+
+    @GetMapping("/confirmar")
+    public ResponseEntity<String> confirmarCadastro(@RequestParam String email) {
+        String resposta = authService.confirmarCadastro(email);
+        return ResponseEntity.status(HttpStatus.OK).body(resposta);
     }
 
     @PostMapping("/login")

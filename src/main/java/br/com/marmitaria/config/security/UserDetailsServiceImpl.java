@@ -2,6 +2,8 @@ package br.com.marmitaria.config.security;
 
 import java.util.ArrayList;
 
+import br.com.marmitaria.exception.usuario.UsuarioNaoConfirmadoException;
+import br.com.marmitaria.exception.usuario.UsuarioNaoEncontradoException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,7 +23,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+                .orElseThrow(UsuarioNaoEncontradoException::new);
+
+        if (!usuario.isEnabled()) {
+            throw new UsuarioNaoConfirmadoException();
+        }
 
         return new org.springframework.security.core.userdetails.User(
                 usuario.getUsername(),
