@@ -7,22 +7,20 @@ import br.com.marmitaria.dto.endereco.RespostaEnderecoDTO;
 import br.com.marmitaria.dto.usuario.RespostaUsuarioDTO;
 import br.com.marmitaria.service.endereco.EnderecoService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import br.com.marmitaria.service.usuario.UsuarioService;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("usuarios")
 public class UsuarioController {
 
-    @Autowired
-	UsuarioService usuarioService;
-
-    @Autowired
-    EnderecoService enderecoService;
+	private final UsuarioService usuarioService;
+    private final EnderecoService enderecoService;
 	
 	@GetMapping
 	public ResponseEntity<List<RespostaUsuarioDTO>> buscarTodos() {

@@ -4,17 +4,17 @@ import br.com.marmitaria.dto.pedido.ConcluirPedidoDTO;
 import br.com.marmitaria.dto.pedido.RespostaPedidoDTO;
 import br.com.marmitaria.service.pedido.PedidoService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/pedidos")
 public class PedidoController {
 
-    @Autowired
-    PedidoService pedidoService;
+    private final PedidoService pedidoService;
 
     @GetMapping("/{id}")
     public ResponseEntity<RespostaPedidoDTO> buscarPedidoPorID(@PathVariable Long id) {

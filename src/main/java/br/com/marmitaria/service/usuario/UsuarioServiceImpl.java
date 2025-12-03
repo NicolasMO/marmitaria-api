@@ -17,27 +17,27 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	public List<RespostaUsuarioDTO> listarTodos() {
-        List<Usuario> usuarios = contexto.usuarioRepository.findAll();
-        return contexto.usuarioMapper.paraListaDTO(usuarios);
+        List<Usuario> usuarios = contexto.getUsuarioRepository().findAll();
+        return contexto.getUsuarioMapper().paraListaDTO(usuarios);
 	}
 	
 	@Override
 	public RespostaUsuarioDTO buscarUsuario() {
-        Long usuarioId = contexto.authenticatedUser.getId();
-        Usuario usuario = contexto.usuarioValidator.validar(usuarioId);
-        return contexto.usuarioMapper.paraDTO(usuario);
+        Long usuarioId = contexto.getAuthenticatedUser().getId();
+        Usuario usuario = contexto.getUsuarioValidator().validar(usuarioId);
+        return contexto.getUsuarioMapper().paraDTO(usuario);
 	}
 
     @Override
     public RespostaUsuarioDTO buscarUsuarioPorID(Long id) {
-        Usuario usuario = contexto.usuarioValidator.validar(id);
-        return contexto.usuarioMapper.paraDTO(usuario);
+        Usuario usuario = contexto.getUsuarioValidator().validar(id);
+        return contexto.getUsuarioMapper().paraDTO(usuario);
     }
 
     @Override
     @Transactional
     public void removerUsuario(Long id) {
-        Usuario usuario = contexto.usuarioValidator.validar(id);
-        contexto.usuarioRepository.delete(usuario);
+        Usuario usuario = contexto.getUsuarioValidator().validar(id);
+        contexto.getUsuarioRepository().delete(usuario);
     }
 }

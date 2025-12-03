@@ -7,19 +7,19 @@ import br.com.marmitaria.dto.produto.CadastroProdutoDTO;
 import br.com.marmitaria.dto.produto.RespostaProdutoDTO;
 import br.com.marmitaria.service.produto.ProdutoService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import br.com.marmitaria.entity.produto.Produto;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("produtos")
 public class ProdutoController {
 
-    @Autowired
-    ProdutoService produtoService;
+    private final ProdutoService produtoService;
 
     @GetMapping
     public ResponseEntity<List<RespostaProdutoDTO>> listarProdutos() {

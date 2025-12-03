@@ -14,6 +14,6 @@ public class UsuarioValidator {
 
     public Usuario validar(Long id) {
         return usuarioRepository.findById(id)
-                .orElseThrow(() -> new UsuarioNaoEncontradoException());
+                .orElseThrow(UsuarioNaoEncontradoException::new);
     }
 }

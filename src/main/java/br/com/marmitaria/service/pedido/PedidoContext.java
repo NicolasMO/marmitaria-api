@@ -8,20 +8,22 @@ import br.com.marmitaria.service.pedido.factory.PedidoFactory;
 import br.com.marmitaria.service.pedido.mapper.PedidoMapper;
 import br.com.marmitaria.service.carrinho.validator.CarrinhoValidator;
 import br.com.marmitaria.service.pedido.validator.PedidoValidator;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Getter
 public class PedidoContext {
 
-    public final AuthenticatedUser authenticatedUser;
-    public final PedidoRepository pedidoRepository;
-    public final CarrinhoService carrinhoService;
-    public final EnderecoValidator enderecoValidator;
-    public final CarrinhoValidator carrinhoValidator;
-    public final PedidoValidator pedidoValidator;
-    public final PedidoFactory pedidoFactory;
-    public final PedidoMapper pedidoMapper;
+    private final AuthenticatedUser authenticatedUser;
+    private final PedidoRepository pedidoRepository;
+    private final CarrinhoService carrinhoService;
+    private final EnderecoValidator enderecoValidator;
+    private final CarrinhoValidator carrinhoValidator;
+    private final PedidoValidator pedidoValidator;
+    private final PedidoFactory pedidoFactory;
+    private final PedidoMapper pedidoMapper;
     
 }

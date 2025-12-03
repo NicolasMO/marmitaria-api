@@ -10,13 +10,11 @@ Este sistema realiza:
 - Registro de endereço para usuários
 - Registro de produtos e ingredientes
 - Montagem de carrinho com diferentes itens
+- Conclusão de pedidos, informando endereço e forma de pagamento
 - Integração com serviços externos como ViaCEP
 
 Futuras atualizações:
-- Implementação de pedidos
 - Relatórios de pedidos de produtos
-- Redução de Boilerplate dos services utilizando factories, modelmappers e helpers
-- Implementação de exceções personalizadas para melhor mensagem de erro para front-end
 - Implementação de estoque de produtos.
 
 ---
@@ -315,4 +313,15 @@ Response:
 - `DELETE /carrinho/item/{id}` - Deleção de item do carrinho
 - `DELETE /carrinho/limpar` - Limpeza de itens do carrinho
 
+---
+
+## 📝 Pedido
+- `GET /pedidos/{id}` - Retorna pedido do usuário logado
+- `POST /pedidos/concluir` - Conclui pedido, finalizando o carrinho
+```json
+{
+  "enderecoId": 1,
+  "formaPagamento": "DINHEIRO"
+}
+```
 ---

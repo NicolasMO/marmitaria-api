@@ -17,9 +17,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public TokenDTO login(LoginDTO dto) {
-        Usuario usuario = contexto.authValidator.validarEmail(dto.email());
-        contexto.authValidator.validarSenha(dto.senha(), usuario.getPassword());
-        String token = contexto.jwtUtil.gerarToken(usuario);
+        Usuario usuario = contexto.getAuthValidator().validarEmail(dto.email());
+        contexto.getAuthValidator().validarSenha(dto.senha(), usuario.getPassword());
+        String token = contexto.getJwtUtil().gerarToken(usuario);
 
         return new TokenDTO(token);
     }
@@ -27,9 +27,9 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public Usuario cadastrarUsuario(CadastroUsuarioDTO dto) {
-        contexto.authValidator.validarSeEmailOuCpfExistem(dto.email(), dto.cpf());
-        Usuario usuario = contexto.authFactory.criarUsuario(dto);
+        contexto.getAuthValidator().validarSeEmailOuCpfExistem(dto.email(), dto.cpf());
+        Usuario usuario = contexto.getAuthFactory().criarUsuario(dto);
 
-        return contexto.usuarioRepository.save(usuario);
+        return contexto.getUsuarioRepository().save(usuario);
     }
 }

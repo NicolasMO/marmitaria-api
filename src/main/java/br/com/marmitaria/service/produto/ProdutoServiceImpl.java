@@ -19,31 +19,31 @@ public class ProdutoServiceImpl implements ProdutoService {
     @Override
     @Transactional
     public Produto cadastrarProduto(CadastroProdutoDTO dto) {
-        contexto.produtoValidator.validarSeNomeExiste(dto.nome());
-        Produto produto = contexto.produtoFactory.criarProduto(dto);
-        return contexto.produtoRepository.save(produto);
+        contexto.getProdutoValidator().validarSeNomeExiste(dto.nome());
+        Produto produto = contexto.getProdutoFactory().criarProduto(dto);
+        return contexto.getProdutoRepository().save(produto);
     }
 
     @Override
     public List<RespostaProdutoDTO> listarTodos() {
-        List<Produto> produtos = contexto.produtoRepository.findAll();
-        return contexto.produtoMapper.paraListaDTO(produtos);
+        List<Produto> produtos = contexto.getProdutoRepository().findAll();
+        return contexto.getProdutoMapper().paraListaDTO(produtos);
     }
 
     @Override
     @Transactional
     public RespostaProdutoDTO atualizarProduto(Long id, AtualizarProdutoDTO dto) {
-        contexto.produtoValidator.validarSeNomeExiste(dto.nome());
-        Produto produto = contexto.produtoValidator.validar(id);
+        contexto.getProdutoValidator().validarSeNomeExiste(dto.nome());
+        Produto produto = contexto.getProdutoValidator().validar(id);
         produto.atualizarDados(dto.nome(), dto.precoUnitario());
-        contexto.produtoRepository.save(produto);
-        return contexto.produtoMapper.paraDTO(produto);
+        contexto.getProdutoRepository().save(produto);
+        return contexto.getProdutoMapper().paraDTO(produto);
     }
 
     @Override
     @Transactional
     public void removerProduto(Long id) {
-        Produto produto = contexto.produtoValidator.validar(id);
-        contexto.produtoRepository.delete(produto);
+        Produto produto = contexto.getProdutoValidator().validar(id);
+        contexto.getProdutoRepository().delete(produto);
     }
 }

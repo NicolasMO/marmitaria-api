@@ -17,30 +17,23 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public RespostaPedidoDTO buscarPorId(Long id) {
-        Long usuarioId = getUsuarioIdAutenticado();
-
-        Pedido pedido = contexto.pedidoValidator.validar(id, usuarioId);
-
-        return contexto.pedidoMapper.paraDTO(pedido);
+        Long usuarioId = contexto.getAuthenticatedUser().getId();
+        Pedido pedido = contexto.getPedidoValidator().validar(id, usuarioId);
+        return contexto.getPedidoMapper().paraDTO(pedido);
     }
 
     @Override
     @Transactional
     public RespostaPedidoDTO concluirPedido(ConcluirPedidoDTO dto) {
-        Long usuarioId = getUsuarioIdAutenticado();
+        Long usuarioId = contexto.getAuthenticatedUser().getId();
 
-        Endereco endereco = contexto.enderecoValidator.validar(dto.enderecoId(), usuarioId);
-        Carrinho carrinho = contexto.carrinhoValidator.validarExistente(usuarioId);
-        Pedido pedido = contexto.pedidoFactory.criarPedido(carrinho, endereco, dto.formaPagamento());
+        Endereco endereco = contexto.getEnderecoValidator().validar(dto.enderecoId(), usuarioId);
+        Carrinho carrinho = contexto.getCarrinhoValidator().validarExistente(usuarioId);
+        Pedido pedido = contexto.getPedidoFactory().criarPedido(carrinho, endereco, dto.formaPagamento());
 
-        contexto.pedidoRepository.save(pedido);
-        contexto.carrinhoService.removerCarrinho(carrinho);
+        contexto.getPedidoRepository().save(pedido);
+        contexto.getCarrinhoService().removerCarrinho(carrinho);
 
-        return contexto.pedidoMapper.paraDTO(pedido);
-    }
-
-    private Long getUsuarioIdAutenticado() {
-        Long usuarioId = contexto.authenticatedUser.getId();
-        return usuarioId;
+        return contexto.getPedidoMapper().paraDTO(pedido);
     }
 }

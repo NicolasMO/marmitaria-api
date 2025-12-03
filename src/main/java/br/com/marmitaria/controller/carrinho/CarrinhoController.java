@@ -5,17 +5,17 @@ import br.com.marmitaria.dto.carrinho.AlterarQuantidadeCarrinhoItemDTO;
 import br.com.marmitaria.dto.carrinho.RespostaCarrinhoDTO;
 import br.com.marmitaria.service.carrinho.CarrinhoService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/carrinho")
 public class CarrinhoController {
 
-    @Autowired
-    CarrinhoService carrinhoService;
+    private final CarrinhoService carrinhoService;
 
     @GetMapping
     public ResponseEntity<RespostaCarrinhoDTO> listarCarrinho() {

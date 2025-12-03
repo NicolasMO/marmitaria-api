@@ -7,16 +7,16 @@ import br.com.marmitaria.exception.endereco.EnderecoLimiteCadastradoException;
 import br.com.marmitaria.exception.endereco.EnderecoNaoEncontradoException;
 import br.com.marmitaria.exception.endereco.EnderecoSemPermissaoException;
 import br.com.marmitaria.repository.endereco.EnderecoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class EnderecoValidator {
 
-    @Autowired
-    EnderecoRepository enderecoRepository;
+    private final EnderecoRepository enderecoRepository;
 
     public Endereco validar(Long id, Long usuarioId) {
         Endereco endereco = enderecoRepository.findById(id)

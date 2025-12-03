@@ -5,7 +5,7 @@ import br.com.marmitaria.dto.auth.TokenDTO;
 import br.com.marmitaria.dto.usuario.CadastroUsuarioDTO;
 import br.com.marmitaria.entity.usuario.Usuario;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.marmitaria.service.auth.AuthService;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    
-    @Autowired
-    AuthService authService;
+
+    private final AuthService authService;
 
     @PostMapping("/register")
     public ResponseEntity<Usuario> cadastrarUsuario(@Valid @RequestBody CadastroUsuarioDTO cadastroUsuarioDTO) {
@@ -29,7 +29,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDTO> login(@RequestBody LoginDTO dto) {
+    public ResponseEntity<TokenDTO> login(@Valid @RequestBody LoginDTO dto) {
         TokenDTO token = authService.login(dto);
         return ResponseEntity.status(HttpStatus.OK).body(token);
     }
