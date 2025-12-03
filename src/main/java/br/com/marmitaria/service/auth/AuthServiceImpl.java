@@ -32,21 +32,28 @@ public class AuthServiceImpl implements AuthService {
         contexto.getAuthValidator().validarSeEmailOuCpfExistem(dto.email(), dto.cpf());
         Usuario usuario = contexto.getAuthFactory().criarUsuario(dto);
 
+        Usuario salvo = contexto.getUsuarioRepository().save(usuario);
+
+        String tokenAtivacao = contexto.getJwtUtil().gerarTokenDeAtivacao(salvo);
+
         String assunto = "Confirme seu cadastro";
         String mensagem = "Obrigado por se cadastrar!\n\n" +
                 "Clique no link para confirmar sua conta:\n" +
-                "http://localhost:8080/auth/confirmar?email=" + usuario.getEmail();
+                "http://localhost:8080/auth/confirmar?token=" + tokenAtivacao;
 
         contexto.getEmailService().enviarEmail(usuario.getEmail(), assunto, mensagem);
 
-        return contexto.getUsuarioRepository().save(usuario);
+        return salvo;
     }
 
     @Override
     @Transactional
-    public String confirmarCadastro(String email) {
+    public String confirmarCadastro(String token) {
+        String email = contexto.getJwtUtil().extrairEmail(token);
         Usuario usuario = contexto.getAuthValidator().validarEmail(email);
+
         if (usuario.isEnabled()) return "Usuário já confirmado.";
+        if (!contexto.getJwtUtil().isTokenValido(token, usuario)) return "Token inválido ou expirado.";
 
         usuario.setAtivo(true);
         contexto.getUsuarioRepository().save(usuario);

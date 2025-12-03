@@ -26,8 +26,8 @@ public class AuthController {
     }
 
     @GetMapping("/confirmar")
-    public ResponseEntity<String> confirmarCadastro(@RequestParam String email) {
-        String resposta = authService.confirmarCadastro(email);
+    public ResponseEntity<String> confirmarCadastro(@RequestParam String token) {
+        String resposta = authService.confirmarCadastro(token);
         return ResponseEntity.status(HttpStatus.OK).body(resposta);
     }
 
