@@ -4,6 +4,7 @@ import br.com.marmitaria.entity.usuario.Usuario;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -13,10 +14,11 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private final String SECRET = "tGxv+UQe2uZ6J8BdFzJhU9G+5n/HhxM7gHavXvOVOgJx1n2TRMdKHTqC2M2cY9EBOgR7ZqXPpTPhBmqD7Lz5Ew==";
+    @Value("${jwt.secret}")
+    private String secret;
 
     private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     public String gerarToken(Usuario usuario) {
