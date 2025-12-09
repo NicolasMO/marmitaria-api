@@ -53,6 +53,9 @@ public class Usuario implements UserDetails {
 
 	@OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Endereco> enderecos;
+
+    @Column(nullable = false)
+    private boolean ativo = false;
 	
 	public Usuario(String nome, String email, String cpf, String celular, String senha) {
 		this.nome = nome;
@@ -60,6 +63,10 @@ public class Usuario implements UserDetails {
         this.cpf = cpf;
 		this.celular = celular;
 		this.senha = senha;
+    }
+
+    public void ativar() {
+        this.ativo = true;
     }
 
 	@Override
@@ -77,9 +84,6 @@ public class Usuario implements UserDetails {
 		return senha;
 	}
 
-    @Override public boolean isAccountNonExpired() { return true; }
-    @Override public boolean isAccountNonLocked() { return true; }
-    @Override public boolean isCredentialsNonExpired() { return true; }
-    @Override public boolean isEnabled() { return true; }
+    @Override public boolean isEnabled() { return ativo; }
 
 }

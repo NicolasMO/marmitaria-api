@@ -4,6 +4,7 @@ import br.com.marmitaria.entity.usuario.Usuario;
 import br.com.marmitaria.exception.auth.AuthCPFJaCadastradoException;
 import br.com.marmitaria.exception.auth.AuthDadosInvalidosException;
 import br.com.marmitaria.exception.auth.AuthEmailJaCadastradoException;
+import br.com.marmitaria.exception.usuario.UsuarioNaoConfirmadoException;
 import br.com.marmitaria.repository.usuario.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,4 +38,9 @@ public class AuthValidator {
         }
     }
 
+    public void validarSeUsuarioConfirmado(Usuario usuario) {
+        if (!usuario.isEnabled()) {
+            throw new UsuarioNaoConfirmadoException();
+        }
+    }
 }
