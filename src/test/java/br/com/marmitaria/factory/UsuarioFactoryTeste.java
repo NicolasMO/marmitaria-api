@@ -1,9 +1,12 @@
 package br.com.marmitaria.factory;
 
 
+import br.com.marmitaria.dto.usuario.RespostaUsuarioDTO;
 import br.com.marmitaria.entity.usuario.Usuario;
 
-public class UsuarioFactory {
+import java.util.List;
+
+public class UsuarioFactoryTeste {
 
     public static Usuario criarUsuarioNaoConfirmado() {
         Usuario u = new Usuario();
@@ -20,5 +23,18 @@ public class UsuarioFactory {
         Usuario usuario = criarUsuarioNaoConfirmado();
         usuario.setAtivo(true);
         return usuario;
+    }
+
+    public static RespostaUsuarioDTO usuarioCriadoDTO() {
+        Usuario usuario = criarUsuarioNaoConfirmado();
+
+        return new RespostaUsuarioDTO(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getCelular(),
+                usuario.getCpf(),
+                List.of()
+        );
     }
 }

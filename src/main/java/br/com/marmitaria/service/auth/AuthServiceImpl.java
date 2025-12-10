@@ -17,24 +17,13 @@ public class AuthServiceImpl implements AuthService {
     private final AuthContext contexto;
 
     @Override
-    public TokenDTO login(LoginDTO dto) {
-        Usuario usuario = contexto.getAuthValidator().validarEmail(dto.email());
-        contexto.getAuthValidator().validarSenha(dto.senha(), usuario.getPassword());
-        contexto.getAuthValidator().validarSeUsuarioConfirmado(usuario);
-
-        String token = contexto.getJwtUtil().gerarToken(usuario);
-
-        return new TokenDTO(token);
-    }
-
-    @Override
     @Transactional
     public RespostaUsuarioDTO cadastrarUsuario(CadastroUsuarioDTO dto) {
         contexto.getAuthValidator().validarSeEmailOuCpfExistem(dto.email(), dto.cpf());
         Usuario usuario = contexto.getAuthFactory().criarUsuario(dto);
-        Usuario salvo = contexto.getUsuarioRepository().save(usuario);
+        contexto.getUsuarioRepository().save(usuario);
 
-        enviarEmailDeConfirmacao(salvo, usuario);
+        enviarEmailDeConfirmacao(usuario, usuario);
 
         return contexto.getUsuarioMapper().paraDTO(usuario);
     }
@@ -46,11 +35,22 @@ public class AuthServiceImpl implements AuthService {
         Usuario usuario = contexto.getAuthValidator().validarEmail(email);
 
         if (!contexto.getJwtUtil().isTokenValido(token, usuario)) return "Token inválido ou expirado.";
-        if (usuario.isEnabled()) return "Usuário já confirmado.";
+        if (usuario.isAtivo()) return "Usuário já confirmado.";
 
         usuario.setAtivo(true);
 
         return "Conta confirmada com sucesso!";
+    }
+
+    @Override
+    public TokenDTO login(LoginDTO dto) {
+        Usuario usuario = contexto.getAuthValidator().validarEmail(dto.email());
+        contexto.getAuthValidator().validarSenha(dto.senha(), usuario.getPassword());
+        contexto.getAuthValidator().validarSeUsuarioConfirmado(usuario);
+
+        String token = contexto.getJwtUtil().gerarToken(usuario);
+
+        return new TokenDTO(token);
     }
 
     private void enviarEmailDeConfirmacao(Usuario salvo, Usuario usuario) {
