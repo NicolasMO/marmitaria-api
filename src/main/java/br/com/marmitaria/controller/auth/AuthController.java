@@ -3,6 +3,7 @@ package br.com.marmitaria.controller.auth;
 import br.com.marmitaria.dto.auth.LoginDTO;
 import br.com.marmitaria.dto.auth.TokenDTO;
 import br.com.marmitaria.dto.usuario.CadastroUsuarioDTO;
+import br.com.marmitaria.dto.usuario.RespostaUsuarioDTO;
 import br.com.marmitaria.entity.usuario.Usuario;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<Usuario> cadastrarUsuario(@Valid @RequestBody CadastroUsuarioDTO cadastroUsuarioDTO) {
-        Usuario criado = authService.cadastrarUsuario(cadastroUsuarioDTO);
+    public ResponseEntity<RespostaUsuarioDTO> cadastrarUsuario(@Valid @RequestBody CadastroUsuarioDTO cadastroUsuarioDTO) {
+        RespostaUsuarioDTO criado = authService.cadastrarUsuario(cadastroUsuarioDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(criado);
     }
 

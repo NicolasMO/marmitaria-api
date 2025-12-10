@@ -3,6 +3,7 @@ package br.com.marmitaria.service.auth;
 import br.com.marmitaria.dto.auth.LoginDTO;
 import br.com.marmitaria.dto.auth.TokenDTO;
 import br.com.marmitaria.dto.usuario.CadastroUsuarioDTO;
+import br.com.marmitaria.dto.usuario.RespostaUsuarioDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,14 +29,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public Usuario cadastrarUsuario(CadastroUsuarioDTO dto) {
+    public RespostaUsuarioDTO cadastrarUsuario(CadastroUsuarioDTO dto) {
         contexto.getAuthValidator().validarSeEmailOuCpfExistem(dto.email(), dto.cpf());
         Usuario usuario = contexto.getAuthFactory().criarUsuario(dto);
         Usuario salvo = contexto.getUsuarioRepository().save(usuario);
 
         enviarEmailDeConfirmacao(salvo, usuario);
 
-        return salvo;
+        return contexto.getUsuarioMapper().paraDTO(usuario);
     }
 
     @Override
