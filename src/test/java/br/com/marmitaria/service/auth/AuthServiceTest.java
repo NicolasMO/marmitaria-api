@@ -9,7 +9,7 @@ import br.com.marmitaria.exception.auth.AuthCPFJaCadastradoException;
 import br.com.marmitaria.exception.auth.AuthDadosInvalidosException;
 import br.com.marmitaria.exception.auth.AuthEmailJaCadastradoException;
 import br.com.marmitaria.exception.usuario.UsuarioNaoConfirmadoException;
-import br.com.marmitaria.factory.AuthDTOFactory;
+import br.com.marmitaria.factory.AuthDTOFactoryTeste;
 import br.com.marmitaria.factory.UsuarioFactoryTeste;
 import br.com.marmitaria.service.auth.factory.AuthFactory;
 import br.com.marmitaria.service.auth.validator.AuthValidator;
@@ -53,7 +53,7 @@ class AuthServiceTest {
 
     @Test
     void deveCadastrarUsuarioComSucesso() {
-        CadastroUsuarioDTO dto = AuthDTOFactory.cadastroDTO();
+        CadastroUsuarioDTO dto = AuthDTOFactoryTeste.cadastroDTO();
         Usuario usuario = UsuarioFactoryTeste.criarUsuarioNaoConfirmado();
         RespostaUsuarioDTO usuarioCriado = UsuarioFactoryTeste.usuarioCriadoDTO();
         String tokenAtivacao = "token-123";
@@ -80,7 +80,7 @@ class AuthServiceTest {
 
     @Test
     void naoDeveCadastrarUsuarioQuandoEmailJaExistir() {
-        CadastroUsuarioDTO dto = AuthDTOFactory.cadastroDTO();
+        CadastroUsuarioDTO dto = AuthDTOFactoryTeste.cadastroDTO();
 
         doThrow(new AuthEmailJaCadastradoException())
                 .when(authValidator)
@@ -96,7 +96,7 @@ class AuthServiceTest {
 
     @Test
     void naoDeveCadastrarUsuarioQuandoCPFJaExistir() {
-        CadastroUsuarioDTO dto = AuthDTOFactory.cadastroDTO();
+        CadastroUsuarioDTO dto = AuthDTOFactoryTeste.cadastroDTO();
 
         doThrow(new AuthCPFJaCadastradoException())
                 .when(authValidator)
@@ -170,7 +170,7 @@ class AuthServiceTest {
 
     @Test
     void deveLogarUsuarioComSucesso() {
-        LoginDTO dto = AuthDTOFactory.loginDTO();
+        LoginDTO dto = AuthDTOFactoryTeste.loginDTO();
         Usuario usuario = UsuarioFactoryTeste.criarUsuarioConfirmado();
         String tokenGerado = "token-valido";
 
@@ -186,7 +186,7 @@ class AuthServiceTest {
 
     @Test
     void naoDeveLogarQuandoEmailNaoEncontrado() {
-        LoginDTO dto = AuthDTOFactory.loginDTO();
+        LoginDTO dto = AuthDTOFactoryTeste.loginDTO();
 
         when(authValidator.validarEmail(dto.email())).thenThrow(new AuthDadosInvalidosException());
 
@@ -200,7 +200,7 @@ class AuthServiceTest {
 
     @Test
     void naoDeveLogarQuandoSenhaInvalida() {
-        LoginDTO dto = AuthDTOFactory.loginDTO();
+        LoginDTO dto = AuthDTOFactoryTeste.loginDTO();
         Usuario usuario = UsuarioFactoryTeste.criarUsuarioConfirmado();
 
         when(authValidator.validarEmail(dto.email())).thenReturn(usuario);
@@ -219,7 +219,7 @@ class AuthServiceTest {
 
     @Test
     void naoDeveLogarSeUsuarioNaoEstiverConfirmado() {
-        LoginDTO dto = AuthDTOFactory.loginDTO();
+        LoginDTO dto = AuthDTOFactoryTeste.loginDTO();
         Usuario usuario = UsuarioFactoryTeste.criarUsuarioNaoConfirmado();
 
         when(authValidator.validarEmail(dto.email())).thenReturn(usuario);

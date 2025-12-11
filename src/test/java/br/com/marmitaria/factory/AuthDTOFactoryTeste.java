@@ -3,7 +3,7 @@ package br.com.marmitaria.factory;
 import br.com.marmitaria.dto.auth.LoginDTO;
 import br.com.marmitaria.dto.usuario.CadastroUsuarioDTO;
 
-public class AuthDTOFactory {
+public class AuthDTOFactoryTeste {
 
     public static LoginDTO loginDTO() {
         return new LoginDTO("teste@email.com", "123456");

@@ -22,7 +22,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 	
 	@Override
-	public RespostaUsuarioDTO buscarUsuario() {
+	public RespostaUsuarioDTO buscarUsuarioAutenticado() {
         Long usuarioId = contexto.getAuthenticatedUser().getId();
         Usuario usuario = contexto.getUsuarioValidator().validar(usuarioId);
         return contexto.getUsuarioMapper().paraDTO(usuario);
