@@ -8,7 +8,7 @@ import org.hibernate.validator.constraints.br.CPF;
 
 public record CadastroUsuarioDTO(
         @Pattern(
-                regexp = "^[A-Za-zÀ-ÿ ]+$",
+                regexp = "^[A-Za-zÀ-ÿ]+(?: [A-Za-zÀ-ÿ]+)*$",
                 message = "O nome deve conter apenas letras e espaços."
         )
         @NotBlank(message = "Nome é obrigatório")
