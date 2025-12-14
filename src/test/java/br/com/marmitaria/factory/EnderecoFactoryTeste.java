@@ -53,4 +53,8 @@ public class EnderecoFactoryTeste {
                 "SP"
         );
     }
+
+    public static Long criarIdEnderecoInexistente() {
+        return 999L;
+    }
 }

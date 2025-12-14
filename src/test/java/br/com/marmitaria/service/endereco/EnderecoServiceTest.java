@@ -5,6 +5,9 @@ import br.com.marmitaria.dto.endereco.CadastroEnderecoDTO;
 import br.com.marmitaria.dto.endereco.RespostaEnderecoDTO;
 import br.com.marmitaria.entity.endereco.Endereco;
 import br.com.marmitaria.entity.usuario.Usuario;
+import br.com.marmitaria.exception.endereco.EnderecoJaCadastradoException;
+import br.com.marmitaria.exception.endereco.EnderecoLimiteCadastradoException;
+import br.com.marmitaria.exception.endereco.EnderecoNaoEncontradoException;
 import br.com.marmitaria.external.viacep.dto.RespostaViaCep;
 import br.com.marmitaria.external.viacep.service.ViaCepService;
 import br.com.marmitaria.factory.EnderecoFactoryTeste;
@@ -134,5 +137,71 @@ public class EnderecoServiceTest {
         inOrder.verify(authenticatedUser).getId();
         inOrder.verify(enderecoValidator).validar(endereco.getId(), usuario.getId());
         inOrder.verify(enderecoRepository).delete(same(endereco));
+    }
+    @Test
+    void naoDeveCadastrarEnderecoSeLimiteExcedido() {
+        CadastroEnderecoDTO dto = EnderecoFactoryTeste.criarCadastroEnderecoDTO();
+        Usuario usuario = UsuarioFactoryTeste.criarUsuarioConfirmado();
+
+        usuario.setEnderecos(List.of(
+                new Endereco(),
+                new Endereco(),
+                new Endereco()
+        ));
+
+        when(authenticatedUser.getId()).thenReturn(usuario.getId());
+        when(usuarioValidator.validar(usuario.getId())).thenReturn(usuario);
+
+        doThrow(new EnderecoLimiteCadastradoException())
+                .when(enderecoValidator)
+                .validarQuantidadeMaxima(usuario.getEnderecos());
+
+        EnderecoLimiteCadastradoException exception = assertThrows(EnderecoLimiteCadastradoException.class,
+                () -> service.cadastrarEndereco(dto));
+
+        assertEquals("Limite de 3 endereços cadastrados.", exception.getMessage());
+        verify(enderecoValidator).validarQuantidadeMaxima(usuario.getEnderecos());
+        verifyNoInteractions(viaCepService, enderecoFactory, enderecoRepository, enderecoMapper);
+    }
+
+    @Test
+    void naoDeveCadastrarEnderecoSeRepetido() {
+        CadastroEnderecoDTO dto = EnderecoFactoryTeste.criarCadastroEnderecoDTO();
+        Usuario usuario = UsuarioFactoryTeste.criarUsuarioConfirmado();
+
+        usuario.setEnderecos(List.of(new Endereco(), new Endereco()));
+
+        when(authenticatedUser.getId()).thenReturn(usuario.getId());
+        when(usuarioValidator.validar(usuario.getId())).thenReturn(usuario);
+
+        doThrow(new EnderecoJaCadastradoException())
+                .when(enderecoValidator)
+                .validarDuplicidade(usuario.getId(), dto);
+
+        EnderecoJaCadastradoException exception = assertThrows(EnderecoJaCadastradoException.class,
+                () -> service.cadastrarEndereco(dto));
+
+        assertEquals("Endereço já cadastrado, informe outro.", exception.getMessage());
+        verify(enderecoValidator).validarDuplicidade(usuario.getId(), dto);
+        verifyNoInteractions(viaCepService, enderecoFactory, enderecoRepository, enderecoMapper);
+    }
+
+    @Test
+    void naoDeveRemoverEnderecoInexistente() {
+        Usuario usuario = UsuarioFactoryTeste.criarUsuarioConfirmado();
+        Long enderecoId = EnderecoFactoryTeste.criarIdEnderecoInexistente();
+
+        when(authenticatedUser.getId()).thenReturn(usuario.getId());
+
+        doThrow(new EnderecoNaoEncontradoException(enderecoId))
+                .when(enderecoValidator)
+                .validar(enderecoId, usuario.getId());
+
+        EnderecoNaoEncontradoException exception = assertThrows(EnderecoNaoEncontradoException.class,
+                () -> service.removerEnderecoDoUsuario(enderecoId));
+
+        assertEquals("Endereço de ID 999 não encontrado", exception.getMessage());
+        verify(enderecoValidator).validar(enderecoId, usuario.getId());
+        verifyNoInteractions(enderecoRepository);
     }
 }
