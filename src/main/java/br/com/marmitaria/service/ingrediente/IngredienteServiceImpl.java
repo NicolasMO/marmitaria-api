@@ -19,14 +19,15 @@ public class IngredienteServiceImpl implements IngredienteService {
 
     @Override
     @Transactional
-    public Ingrediente cadastrarIngrediente(CadastroIngredienteDTO dto) {
+    public RespostaIngredienteDTO cadastrarIngrediente(CadastroIngredienteDTO dto) {
         contexto.getIngredienteValidator().validarSeNomeExiste(dto.nome());
         Ingrediente ingrediente = contexto.getIngredienteFactory().criarIngrediente(dto);
-        return contexto.getIngredienteRepository().save(ingrediente);
+        contexto.getIngredienteRepository().save(ingrediente);
+        return contexto.getIngredienteMapper().paraDTO(ingrediente);
     }
 
     @Override
-    public RespostaIngredienteDTO listarIngredientePorId(long id) {
+    public RespostaIngredienteDTO listarIngredientePorId(Long id) {
         Ingrediente ingrediente = contexto.getIngredienteValidator().validar(id);
         return contexto.getIngredienteMapper().paraDTO(ingrediente);
     }

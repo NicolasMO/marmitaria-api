@@ -8,8 +8,8 @@ import br.com.marmitaria.dto.ingrediente.RespostaIngredienteDTO;
 import br.com.marmitaria.entity.ingrediente.Ingrediente;
 
 public interface IngredienteService  {
-    Ingrediente cadastrarIngrediente(CadastroIngredienteDTO dto);
-    RespostaIngredienteDTO listarIngredientePorId(long id);
+    RespostaIngredienteDTO cadastrarIngrediente(CadastroIngredienteDTO dto);
+    RespostaIngredienteDTO listarIngredientePorId(Long id);
     List<RespostaIngredienteDTO> listarTodos();
     RespostaIngredienteDTO atualizarIngrediente(Long id, AtualizarIngredienteDTO dto);
     void removerIngrediente(Long id);

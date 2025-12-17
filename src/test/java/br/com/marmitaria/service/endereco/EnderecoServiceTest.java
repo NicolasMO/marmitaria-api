@@ -46,7 +46,7 @@ public class EnderecoServiceTest {
     private EnderecoServiceImpl service;
 
     @BeforeEach
-    void setup () {
+    void setup() {
         lenient().when(contexto.getEnderecoRepository()).thenReturn(enderecoRepository);
         lenient().when(contexto.getEnderecoFactory()).thenReturn(enderecoFactory);
         lenient().when(contexto.getEnderecoValidator()).thenReturn(enderecoValidator);
