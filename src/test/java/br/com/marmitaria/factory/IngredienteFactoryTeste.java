@@ -9,7 +9,7 @@ public class IngredienteFactoryTeste {
 
     public static CadastroIngredienteDTO criarCadastroIngredienteDTO() {
         return new CadastroIngredienteDTO(
-                "Peito de frango",
+                "Peito de Frango",
                 CategoriaIngrediente.PROTEINA
         );
     }

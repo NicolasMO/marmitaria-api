@@ -3,6 +3,8 @@ package br.com.marmitaria.service.ingrediente;
 import br.com.marmitaria.dto.ingrediente.CadastroIngredienteDTO;
 import br.com.marmitaria.dto.ingrediente.RespostaIngredienteDTO;
 import br.com.marmitaria.entity.ingrediente.Ingrediente;
+import br.com.marmitaria.exception.ingrediente.IngredienteJaExistenteException;
+import br.com.marmitaria.exception.ingrediente.IngredienteNaoEncontradoException;
 import br.com.marmitaria.factory.IngredienteFactoryTeste;
 import br.com.marmitaria.repository.ingrediente.IngredienteRepository;
 import br.com.marmitaria.service.ingrediente.factory.IngredienteFactory;
@@ -110,5 +112,42 @@ public class IngredienteServiceTest {
         InOrder inOrder = inOrder(ingredienteValidator, ingredienteRepository);
         inOrder.verify(ingredienteValidator).validar(ingrediente.getId());
         inOrder.verify(ingredienteRepository).delete(same(ingrediente));
+    }
+
+    @Test
+    void naoDeveCadastrarIngredienteRepetido() {
+        CadastroIngredienteDTO dto = IngredienteFactoryTeste.criarCadastroIngredienteDTO();
+        Ingrediente ingrediente = IngredienteFactoryTeste.criarIngredienteProteina();
+
+        doThrow(new IngredienteJaExistenteException(ingrediente.getNome()))
+                .when(ingredienteValidator)
+                .validarSeNomeExiste(dto.nome());
+
+        IngredienteJaExistenteException exception = assertThrows(IngredienteJaExistenteException.class,
+                () -> service.cadastrarIngrediente(dto));
+
+        assertEquals(String.format("Ingrediente já existente: '%s'.", dto.nome()), exception.getMessage());
+        verify(ingredienteValidator).validarSeNomeExiste(dto.nome());
+        verifyNoInteractions(ingredienteFactory, ingredienteRepository, ingredienteMapper);
+    }
+
+    @Test
+    void naoDeveListarIngredienteInexistente() {
+        Long idInexistente = 99L;
+
+        doThrow(new IngredienteNaoEncontradoException(idInexistente))
+                .when(ingredienteValidator)
+                .validar(idInexistente);
+
+        IngredienteNaoEncontradoException exception = assertThrows(IngredienteNaoEncontradoException.class,
+                () -> service.listarIngredientePorId(idInexistente));
+
+        assertEquals(
+                String.format("Ingrediente com ID %d não encontrado.", idInexistente),
+                exception.getMessage()
+        );
+
+        verify(ingredienteValidator).validar(idInexistente);
+        verifyNoInteractions(ingredienteMapper);
     }
 }
