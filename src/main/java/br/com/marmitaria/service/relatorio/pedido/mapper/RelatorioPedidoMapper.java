@@ -6,7 +6,10 @@ import br.com.marmitaria.entity.ingrediente.Ingrediente;
 import br.com.marmitaria.entity.pedido.Pedido;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Component
 public class RelatorioPedidoMapper {
@@ -15,7 +18,7 @@ public class RelatorioPedidoMapper {
         return new RelatorioPedidoDTO(
                 pedido.getId(),
                 pedido.getDataPedido(),
-                mapItens(pedido),
+                mapearItens(pedido),
                 pedido.getTotal(),
                 pedido.getEnderecoEntrega()
         );
@@ -27,17 +30,19 @@ public class RelatorioPedidoMapper {
                 .toList();
     }
 
-    private List<RelatorioPedidoItemDTO> mapItens(Pedido pedido) {
+    private List<RelatorioPedidoItemDTO> mapearItens(Pedido pedido) {
         return pedido.getItens().stream()
-                .map(item -> new RelatorioPedidoItemDTO(
-                        item.getProduto().getNome(),
-                        item.getIngredientes().stream()
-                                .map(Ingrediente::getNome)
-                                .toList(),
-                        item.getQuantidade(),
-                        item.getProduto().getPrecoUnitario(),
-                        item.getPedido().getTotal()
-                ))
-                .toList();
+                .map(item -> {
+                    BigDecimal valorUnitario = item.getProduto().getPrecoUnitario();
+                    BigDecimal valorTotalItem = valorUnitario.multiply(BigDecimal.valueOf(item.getQuantidade()));
+
+                    return new RelatorioPedidoItemDTO(
+                            item.getProduto().getNome(),
+                            item.getIngredientes().stream().map(Ingrediente::getNome).toList(),
+                            item.getQuantidade(),
+                            valorUnitario,
+                            valorTotalItem
+                    );
+                }).toList();
     }
 }
