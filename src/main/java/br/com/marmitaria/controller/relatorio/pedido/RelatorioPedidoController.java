@@ -19,11 +19,19 @@ public class RelatorioPedidoController {
 
     @GetMapping("/geral")
     public ResponseEntity<Page<RelatorioPedidoDTO>> gerarRelatorio(@RequestParam LocalDate inicio, @RequestParam LocalDate fim, Pageable paginacao) {
-        return ResponseEntity.ok(service.gerarRelatorio(inicio, fim, paginacao));
+        Page<RelatorioPedidoDTO> relatorio = service.gerarRelatorio(inicio, fim, paginacao);
+        return ResponseEntity.ok(relatorio);
     }
 
     @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<Page<RelatorioPedidoDTO>> relatorioPedidoPorUsuario(@PathVariable Long id, Pageable paginacao) {
+    public ResponseEntity<Page<RelatorioPedidoDTO>> relatorioPedidosPorUsuario(@PathVariable Long usuarioId, Pageable paginacao) {
+        Page<RelatorioPedidoDTO> relatorio = service.gerarRelatorioPorUsuario(usuarioId, paginacao);
+        return ResponseEntity.ok(relatorio);
+    }
 
+    @GetMapping("/usuario/me")
+    public ResponseEntity<Page<RelatorioPedidoDTO>> relatorioPedidosDoUsuario(Pageable paginacao) {
+        Page<RelatorioPedidoDTO> relatorio = service.gerarRelatorioDoUsuario(paginacao);
+        return ResponseEntity.ok(relatorio);
     }
  }

@@ -11,6 +11,7 @@ public record RelatorioPedidoDTO(
         Long pedidoId,
         @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
         LocalDateTime dataPedido,
+        String solicitante,
         List<RelatorioPedidoItemDTO> itens,
         BigDecimal valorTotalPedido,
         String endereco

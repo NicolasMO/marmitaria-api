@@ -9,4 +9,6 @@ import java.time.LocalDate;
 
 public interface RelatorioPedidoService {
     Page<RelatorioPedidoDTO> gerarRelatorio(LocalDate inicio, LocalDate fim, Pageable paginacao);
+    Page<RelatorioPedidoDTO> gerarRelatorioPorUsuario(Long usuarioId, Pageable paginacao);
+    Page<RelatorioPedidoDTO> gerarRelatorioDoUsuario(Pageable paginacao);
 }
