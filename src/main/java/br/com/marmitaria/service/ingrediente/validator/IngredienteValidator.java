@@ -9,6 +9,8 @@ import br.com.marmitaria.repository.ingrediente.IngredienteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class IngredienteValidator {
@@ -28,5 +30,18 @@ public class IngredienteValidator {
         boolean nenhumCampoEnviado = (dto.nome() == null || dto.nome().isBlank()) && dto.categoria() == null;
 
         if (nenhumCampoEnviado) throw new RequisicaoVaziaException();
+    }
+
+    public void validarTodosExistem(List<String> nomes) {
+        List<String> existentes =
+                ingredienteRepository.findNomesExistentes(nomes);
+
+        List<String> naoEncontrados = nomes.stream()
+                .filter(nome -> !existentes.contains(nome))
+                .toList();
+
+        if (!naoEncontrados.isEmpty()) {
+            throw new IngredienteNaoEncontradoException(naoEncontrados);
+        }
     }
 }
