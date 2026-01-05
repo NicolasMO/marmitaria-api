@@ -1,5 +1,6 @@
 package br.com.marmitaria.entity.usuario;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -52,7 +53,7 @@ public class Usuario implements UserDetails {
 	private String cpf;
 
 	@OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Endereco> enderecos;
+    private List<Endereco> enderecos = new ArrayList<>();
 
     @Column(nullable = false)
     private boolean ativo = false;

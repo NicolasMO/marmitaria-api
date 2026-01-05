@@ -5,6 +5,7 @@ import br.com.marmitaria.repository.usuario.UsuarioRepository;
 import br.com.marmitaria.service.auth.factory.AuthFactory;
 import br.com.marmitaria.service.auth.validator.AuthValidator;
 import br.com.marmitaria.service.email.EmailService;
+import br.com.marmitaria.service.usuario.mapper.UsuarioMapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 @Getter
 public class AuthContext {
 
+    private final UsuarioMapper usuarioMapper;
     private final UsuarioRepository usuarioRepository;
     private final EmailService emailService;
     private final AuthValidator authValidator;

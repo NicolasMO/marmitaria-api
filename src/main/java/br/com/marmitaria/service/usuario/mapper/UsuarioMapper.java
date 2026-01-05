@@ -14,15 +14,16 @@ import java.util.List;
 public class UsuarioMapper {
 
     public RespostaUsuarioDTO paraDTO(Usuario usuario) {
+        List<Endereco> enderecos = usuario.getEnderecos();
+
         return new RespostaUsuarioDTO(
                 usuario.getId(),
                 usuario.getNome(),
                 usuario.getEmail(),
                 usuario.getCelular(),
                 usuario.getCpf(),
-                usuario.getEnderecos().stream()
-                        .map(this::paraEnderecoDTO)
-                        .toList()
+                enderecos == null ? List.of() :
+                        enderecos.stream().map(this::paraEnderecoDTO).toList()
         );
     }
 
