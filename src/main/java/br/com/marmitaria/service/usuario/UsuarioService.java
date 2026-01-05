@@ -6,7 +6,7 @@ import br.com.marmitaria.dto.usuario.RespostaUsuarioDTO;
 
 public interface UsuarioService {
     List<RespostaUsuarioDTO> listarTodos();
-    RespostaUsuarioDTO buscarUsuario();
+    RespostaUsuarioDTO buscarUsuarioAutenticado();
     RespostaUsuarioDTO buscarUsuarioPorID(Long id);
     void removerUsuario(Long id);
 }

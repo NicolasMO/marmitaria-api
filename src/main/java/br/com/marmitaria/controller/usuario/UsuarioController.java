@@ -29,8 +29,8 @@ public class UsuarioController {
 	}
 
     @GetMapping("/info")
-    public ResponseEntity<RespostaUsuarioDTO> buscarUsuario() {
-        RespostaUsuarioDTO dto = usuarioService.buscarUsuario();
+    public ResponseEntity<RespostaUsuarioDTO> buscarUsuarioAutenticado() {
+        RespostaUsuarioDTO dto = usuarioService.buscarUsuarioAutenticado();
 		return ResponseEntity.status(HttpStatus.OK).body(dto);
 	}
 
