@@ -5,6 +5,7 @@ import br.com.marmitaria.entity.pedido.Pedido;
 import br.com.marmitaria.entity.usuario.Usuario;
 import br.com.marmitaria.repository.pedido.PedidoRepository;
 import br.com.marmitaria.service.relatorio.pedido.mapper.RelatorioPedidoMapper;
+import br.com.marmitaria.utils.NormalizadorTexto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +48,46 @@ public class RelatorioPedidoServiceImpl implements RelatorioPedidoService {
         Usuario usuario = contexto.getUsuarioValidator().validar(usuarioAutenticadoId);
 
         Page<Pedido> pedidos = contexto.getPedidoRepository().findByUsuarioId(usuarioAutenticadoId, paginacao);
+
+        return pedidos.map(contexto.getRelatorioMapper()::paraDTO);
+    }
+
+    @Override
+    public Page<RelatorioPedidoDTO> gerarRelatorioPorProdutos(List<String> produtos, Pageable paginacao) {
+        List<String> produtosNormalizados = produtos.stream()
+                .map(NormalizadorTexto::normalizarNome)
+                .toList();
+
+        contexto.getProdutoValidator().validarTodosExistem(produtosNormalizados);
+
+        Page<Pedido> pedidos =
+                contexto.getPedidoRepository()
+                        .findPedidosComTodosProdutos(produtosNormalizados,
+                                produtosNormalizados.size(),
+                                paginacao);
+
+        return pedidos.map(contexto.getRelatorioMapper()::paraDTO);
+    }
+
+    @Override
+    public Page<RelatorioPedidoDTO> gerarRelatorioPorIngredientes(
+            List<String> ingredientes,
+            Pageable paginacao
+    ) {
+        List<String> ingredientesNormalizados = ingredientes.stream()
+                .map(NormalizadorTexto::normalizarNome)
+                .toList();
+
+        contexto.getIngredienteValidator()
+                .validarTodosExistem(ingredientesNormalizados);
+
+        Page<Pedido> pedidos =
+                contexto.getPedidoRepository()
+                        .findPedidosComTodosIngredientes(
+                                ingredientesNormalizados,
+                                ingredientesNormalizados.size(),
+                                paginacao
+                        );
 
         return pedidos.map(contexto.getRelatorioMapper()::paraDTO);
     }
