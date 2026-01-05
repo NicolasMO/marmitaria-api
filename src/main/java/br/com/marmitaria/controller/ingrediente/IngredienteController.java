@@ -34,8 +34,8 @@ public class IngredienteController {
     }
 
     @PostMapping
-    public ResponseEntity<Ingrediente> cadastrarIngrediente(@Valid @RequestBody CadastroIngredienteDTO dto) {
-        Ingrediente ingrediente = ingredienteService.cadastrarIngrediente(dto);
+    public ResponseEntity<RespostaIngredienteDTO> cadastrarIngrediente(@Valid @RequestBody CadastroIngredienteDTO dto) {
+        RespostaIngredienteDTO ingrediente = ingredienteService.cadastrarIngrediente(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(ingrediente);
     }
 

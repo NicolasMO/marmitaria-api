@@ -5,6 +5,6 @@ import org.springframework.http.HttpStatus;
 
 public class IngredienteNaoEncontradoException extends BusinessException {
     public IngredienteNaoEncontradoException(Long id) {
-        super(String.format("Ingrediente com ID %d não encontrado", id), HttpStatus.NOT_FOUND);
+        super(String.format("Ingrediente com ID %d não encontrado.", id), HttpStatus.NOT_FOUND);
     }
 }
