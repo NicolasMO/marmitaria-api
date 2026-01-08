@@ -1,6 +1,7 @@
 package br.com.marmitaria.config.security;
 
 import br.com.marmitaria.entity.usuario.Usuario;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -25,6 +26,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .setSubject(usuario.getUsername())
                 .claim("id", usuario.getId())
+                .claim("role", usuario.getRole().name())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 86400000))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -41,12 +43,12 @@ public class JwtUtil {
     }
 
     public String extrairEmail(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        return extrairClaims(token).getSubject();
+    }
+
+
+    public String extrairRole(String token) {
+        return extrairClaims(token).get("role", String.class);
     }
 
     public boolean isTokenValido(String token, Usuario usuario) {
@@ -55,13 +57,16 @@ public class JwtUtil {
     }
 
     private boolean isTokenExpirado(String token) {
-        Date expiration = Jwts.parserBuilder()
+        return extrairClaims(token)
+                .getExpiration()
+                .before(new Date());
+    }
+
+    private Claims extrairClaims(String token) {
+        return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
-                .getBody()
-                .getExpiration();
-
-        return expiration.before(new Date());
+                .getBody();
     }
 }

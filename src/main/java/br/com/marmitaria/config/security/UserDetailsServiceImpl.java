@@ -1,10 +1,12 @@
 package br.com.marmitaria.config.security;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import br.com.marmitaria.exception.usuario.UsuarioNaoConfirmadoException;
 import br.com.marmitaria.exception.usuario.UsuarioNaoEncontradoException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -32,7 +34,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 usuario.getUsername(),
                 usuario.getPassword(),
-                new ArrayList<>()
+                List.of(new SimpleGrantedAuthority("ROLE_" + usuario.getRole().name()))
         );
      }
 }

@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import br.com.marmitaria.entity.ingrediente.Ingrediente;
@@ -26,7 +27,8 @@ public class IngredienteController {
 		List<RespostaIngredienteDTO> ingredientes = ingredienteService.listarTodos();
 		return ResponseEntity.status(HttpStatus.OK).body(ingredientes);
 	}
-	
+
+    @PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/{id}")
     public ResponseEntity<RespostaIngredienteDTO> listarIngredientePorId(@PathVariable Long id) {
         RespostaIngredienteDTO ingrediente = ingredienteService.listarIngredientePorId(id);

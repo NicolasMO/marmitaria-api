@@ -3,6 +3,8 @@ package br.com.marmitaria.config.security;
 import br.com.marmitaria.repository.usuario.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -35,7 +37,11 @@ public class JwtFilter extends OncePerRequestFilter {
                     var usuario = usuarioRepository.findByEmail(email).orElse(null);
 
                     if (usuario != null && usuario.isEnabled() && jwtUtil.isTokenValido(token, usuario)) {
-                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(usuario, null, List.of());
+                        String role = jwtUtil.extrairRole(token);
+
+                        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+
+                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(usuario, null, authorities);
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
                 }
