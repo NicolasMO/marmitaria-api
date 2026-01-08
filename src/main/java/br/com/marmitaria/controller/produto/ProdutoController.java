@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import br.com.marmitaria.entity.produto.Produto;
@@ -21,24 +22,28 @@ public class ProdutoController {
 
     private final ProdutoService produtoService;
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<List<RespostaProdutoDTO>> listarProdutos() {
         List<RespostaProdutoDTO> produtos = produtoService.listarTodos();
         return ResponseEntity.status(HttpStatus.OK).body(produtos);
     }
 
+    @PreAuthorize("hasAnyRoles('ADMIN', 'OPERADOR')")
     @PostMapping
     public ResponseEntity<Produto> cadastrarProduto(@Valid @RequestBody CadastroProdutoDTO dto) {
         Produto produto = produtoService.cadastrarProduto(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(produto);
     }
 
+    @PreAuthorize("hasAnyRoles('ADMIN', 'OPERADOR')")
     @PutMapping("/atualizar/{id}")
     public ResponseEntity<RespostaProdutoDTO> atualizarProduto(@PathVariable Long id, @Valid @RequestBody AtualizarProdutoDTO dto) {
         RespostaProdutoDTO produto = produtoService.atualizarProduto(id, dto);
         return ResponseEntity.status(HttpStatus.OK).body(produto);
     }
 
+    @PreAuthorize("hasAnyRoles('ADMIN', 'OPERADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> removerProduto(@PathVariable Long id) {
         produtoService.removerProduto(id);
