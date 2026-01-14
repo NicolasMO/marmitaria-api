@@ -36,6 +36,35 @@ Futuras atualizações:
 ## 📦 Como Executar o Projeto
 Antes de executar, é necessário reiniciar o container Docker e limpar os volumes (para resetar o banco de dados e garantir um ambiente limpo de testes).
 
+### 1️⃣ Criar arquivos de ambiente
+
+#### 📄 `.env`
+Crie um arquivo `.env` na raiz do projeto:
+
+```env
+DB_USER=postgres
+DB_PASSWORD=123456
+DB_NAME=marmitaria
+```
+
+### 2️⃣ Criar arquivos de ambiente
+
+#### 📄 `application-local.properties`
+Crie um arquivo `application-local.properties` em src/main/resources/
+
+```env
+JWT_SECRET=chave_secreta_de_testes
+
+DB_URL=jdbc:postgresql://localhost:5432/marmitaria
+DB_USER=postgres
+DB_PASSWORD=123456
+
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USER=seu_email@gmail.com
+MAIL_PASSWORD=sua_senha_de_app
+```
+
 Para usuários Linux / WSL / macOS:
 Execute os comandos abaixo com sudo, pois o Docker pode exigir permissões administrativas:
 
