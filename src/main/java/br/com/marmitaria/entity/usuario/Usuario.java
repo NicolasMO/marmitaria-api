@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import br.com.marmitaria.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -57,6 +58,10 @@ public class Usuario implements UserDetails {
 
     @Column(nullable = false)
     private boolean ativo = false;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 	
 	public Usuario(String nome, String email, String cpf, String celular, String senha) {
 		this.nome = nome;

@@ -1,9 +1,6 @@
 package br.com.marmitaria.service.relatorio.pedido;
 
 import br.com.marmitaria.dto.pedido.RelatorioPedidoDTO;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

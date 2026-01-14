@@ -3,8 +3,6 @@ package br.com.marmitaria.service.relatorio.pedido;
 import br.com.marmitaria.dto.pedido.RelatorioPedidoDTO;
 import br.com.marmitaria.entity.pedido.Pedido;
 import br.com.marmitaria.entity.usuario.Usuario;
-import br.com.marmitaria.repository.pedido.PedidoRepository;
-import br.com.marmitaria.service.relatorio.pedido.mapper.RelatorioPedidoMapper;
 import br.com.marmitaria.utils.NormalizadorTexto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

@@ -5,7 +5,6 @@ import java.util.List;
 import br.com.marmitaria.dto.ingrediente.AtualizarIngredienteDTO;
 import br.com.marmitaria.dto.ingrediente.CadastroIngredienteDTO;
 import br.com.marmitaria.dto.ingrediente.RespostaIngredienteDTO;
-import br.com.marmitaria.entity.ingrediente.Ingrediente;
 
 public interface IngredienteService  {
     RespostaIngredienteDTO cadastrarIngrediente(CadastroIngredienteDTO dto);

@@ -10,10 +10,6 @@ public class ProdutoNaoEncontradoException extends BusinessException {
         super(String.format("Produto com ID %d não encontrado", id), HttpStatus.NOT_FOUND);
     }
 
-    public ProdutoNaoEncontradoException(String nome) {
-        super(String.format("Produto '%s' não encontrado", nome), HttpStatus.NOT_FOUND);
-    }
-
     public ProdutoNaoEncontradoException(List<String> nomes) {
         super("Produtos não encontrados: " + String.join(", ", nomes), HttpStatus.NOT_FOUND);
     }
