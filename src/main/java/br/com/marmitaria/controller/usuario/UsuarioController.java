@@ -23,7 +23,7 @@ public class UsuarioController {
 	private final UsuarioService usuarioService;
     private final EnderecoService enderecoService;
 
-    @PreAuthorize("hasAnyRoles('ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
 	@GetMapping
 	public ResponseEntity<List<RespostaUsuarioDTO>> buscarTodos() {
 		List<RespostaUsuarioDTO> dto = usuarioService.listarTodos();
@@ -37,14 +37,14 @@ public class UsuarioController {
 		return ResponseEntity.status(HttpStatus.OK).body(dto);
 	}
 
-    @PreAuthorize("hasAnyRoles('ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
     @GetMapping("/{id}")
     public ResponseEntity<RespostaUsuarioDTO> buscarUsuarioPorID(@PathVariable Long id) {
         RespostaUsuarioDTO dto = usuarioService.buscarUsuarioPorID(id);
         return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
 
-    @PreAuthorize("hasAnyRoles('ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> removerUsuario(@PathVariable Long id) {
         usuarioService.removerUsuario(id);

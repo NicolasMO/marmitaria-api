@@ -3,7 +3,6 @@ package br.com.marmitaria.dto.usuario;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.br.CPF;
 
 public record CadastroUsuarioDTO(

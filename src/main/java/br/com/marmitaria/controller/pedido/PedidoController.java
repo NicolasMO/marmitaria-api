@@ -17,7 +17,7 @@ public class PedidoController {
 
     private final PedidoService pedidoService;
 
-    @PreAuthorize("hasAnyRoles('ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
     @GetMapping("/{id}")
     public ResponseEntity<RespostaPedidoDTO> buscarPedidoPorID(@PathVariable Long id) {
         RespostaPedidoDTO dto = pedidoService.buscarPorId(id);

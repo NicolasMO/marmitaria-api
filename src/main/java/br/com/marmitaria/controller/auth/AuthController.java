@@ -4,12 +4,10 @@ import br.com.marmitaria.dto.auth.LoginDTO;
 import br.com.marmitaria.dto.auth.TokenDTO;
 import br.com.marmitaria.dto.usuario.CadastroUsuarioDTO;
 import br.com.marmitaria.dto.usuario.RespostaUsuarioDTO;
-import br.com.marmitaria.entity.usuario.Usuario;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import br.com.marmitaria.service.auth.AuthService;

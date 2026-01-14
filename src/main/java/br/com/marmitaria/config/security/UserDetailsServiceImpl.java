@@ -1,6 +1,5 @@
 package br.com.marmitaria.config.security;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import br.com.marmitaria.exception.usuario.UsuarioNaoConfirmadoException;

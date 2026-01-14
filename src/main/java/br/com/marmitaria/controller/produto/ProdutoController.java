@@ -29,21 +29,21 @@ public class ProdutoController {
         return ResponseEntity.status(HttpStatus.OK).body(produtos);
     }
 
-    @PreAuthorize("hasAnyRoles('ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
     @PostMapping
     public ResponseEntity<Produto> cadastrarProduto(@Valid @RequestBody CadastroProdutoDTO dto) {
         Produto produto = produtoService.cadastrarProduto(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(produto);
     }
 
-    @PreAuthorize("hasAnyRoles('ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
     @PutMapping("/atualizar/{id}")
     public ResponseEntity<RespostaProdutoDTO> atualizarProduto(@PathVariable Long id, @Valid @RequestBody AtualizarProdutoDTO dto) {
         RespostaProdutoDTO produto = produtoService.atualizarProduto(id, dto);
         return ResponseEntity.status(HttpStatus.OK).body(produto);
     }
 
-    @PreAuthorize("hasAnyRoles('ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> removerProduto(@PathVariable Long id) {
         produtoService.removerProduto(id);

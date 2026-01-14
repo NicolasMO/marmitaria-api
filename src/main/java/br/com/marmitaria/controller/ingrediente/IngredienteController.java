@@ -13,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import br.com.marmitaria.entity.ingrediente.Ingrediente;
-
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("ingredientes")
@@ -29,28 +27,28 @@ public class IngredienteController {
 		return ResponseEntity.status(HttpStatus.OK).body(ingredientes);
 	}
 
-    @PreAuthorize("hasAnyRoles('ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
 	@GetMapping("/{id}")
     public ResponseEntity<RespostaIngredienteDTO> listarIngredientePorId(@PathVariable Long id) {
         RespostaIngredienteDTO ingrediente = ingredienteService.listarIngredientePorId(id);
         return ResponseEntity.status(HttpStatus.OK).body(ingrediente);
     }
 
-    @PreAuthorize("hasAnyRoles('ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
     @PostMapping
     public ResponseEntity<RespostaIngredienteDTO> cadastrarIngrediente(@Valid @RequestBody CadastroIngredienteDTO dto) {
         RespostaIngredienteDTO ingrediente = ingredienteService.cadastrarIngrediente(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(ingrediente);
     }
 
-    @PreAuthorize("hasAnyRoles('ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
     @PatchMapping("/{id}")
     public ResponseEntity<RespostaIngredienteDTO> atualizarIngrediente(@PathVariable Long id, @RequestBody AtualizarIngredienteDTO dto) {
         RespostaIngredienteDTO ingrediente = ingredienteService.atualizarIngrediente(id, dto);
         return ResponseEntity.status(HttpStatus.OK).body(ingrediente);
     }
 
-    @PreAuthorize("hasRole('ADMIN'")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> removerIngrediente(@PathVariable Long id) {
         ingredienteService.removerIngrediente(id);
