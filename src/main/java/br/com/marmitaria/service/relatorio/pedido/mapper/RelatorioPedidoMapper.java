@@ -18,6 +18,7 @@ public class RelatorioPedidoMapper {
         return new RelatorioPedidoDTO(
                 pedido.getId(),
                 pedido.getDataPedido(),
+                pedido.getFormaPagamento(),
                 pedido.getUsuario().getNome(),
                 mapearItens(pedido),
                 pedido.getTotal(),
